@@ -1,6 +1,13 @@
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, type ReactNode } from "react";
 import type { FormField } from "@/lib/orbit";
@@ -79,24 +86,30 @@ export function DynamicForm({
         );
       case "select":
         return (
-          <select
-            value={typeof val === "string" ? val : ""}
-            onChange={(e) => set(field.id, e.target.value)}
-            className={cn(
-              "flex h-10 w-full rounded-md border border-input bg-black/20 px-3 py-2 text-sm text-foreground shadow-sm outline-none transition-colors",
-              "focus:border-ember/60 focus:ring-2 focus:ring-ember/20",
-              typeof val === "string" && val === "" && "text-white/50",
-            )}
+          <Select
+            value={typeof val === "string" && val ? val : undefined}
+            onValueChange={(value) => set(field.id, value)}
           >
-            <option value="" disabled className="bg-black">
-              {field.placeholder ?? "Choose…"}
-            </option>
-            {(field.options ?? []).map((opt) => (
-              <option key={opt} value={opt} className="bg-black">
-                {opt}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger
+              className={cn(
+                "w-full bg-black/20 text-white data-[placeholder]:text-white/45",
+                "focus:border-ember/60 focus:ring-2 focus:ring-ember/20",
+              )}
+            >
+              <SelectValue placeholder={field.placeholder ?? "Choose…"} />
+            </SelectTrigger>
+            <SelectContent className="border-gold/25 bg-[#221534] text-white">
+              {(field.options ?? []).map((opt) => (
+                <SelectItem
+                  key={opt}
+                  value={opt}
+                  className="focus:bg-ember/15 focus:text-white"
+                >
+                  {opt}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         );
       case "radio":
         return (

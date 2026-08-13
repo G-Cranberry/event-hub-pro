@@ -13,7 +13,7 @@ import {
   Ticket,
   Users,
 } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +37,7 @@ export default function EventDetails() {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [justRegistered, setJustRegistered] = useState(false);
+  const initialized = useRef(false);
 
   const event = context?.event ?? null;
   const myRegistration = context?.myRegistration ?? null;
@@ -45,12 +46,21 @@ export default function EventDetails() {
     if (id) sessionStorage.setItem("orbit:lastEvent", id);
   }, [id]);
 
+  // Initialize the form exactly once. The reactive `event` reference can change
+  // between renders (Convex re-returns query results), so depending on it here
+  // would wipe whatever the participant has typed.
   useEffect(() => {
-    if (event) {
+    if (event && !initialized.current) {
+      initialized.current = true;
       setRegType(event.registrationType === "team" ? "team" : "individual");
       setValues(initialValues(event.formSchema));
     }
   }, [event]);
+
+  const updateValues = (next: FormValues) => {
+    setValues(next);
+    if (error) setError(null);
+  };
 
   const open = !!event && event.regOpen && event.status === "published" && isUpcoming(event);
   const showForm = open && !myRegistration && !justRegistered;
@@ -394,7 +404,7 @@ export default function EventDetails() {
                 <DynamicForm
                   schema={event.formSchema}
                   values={values}
-                  onChange={setValues}
+                  onChange={updateValues}
                 />
               </div>
 
