@@ -112,11 +112,11 @@ export const getPhotoUrls = query({
   handler: async (ctx, { eventId }) => {
     const userId = await getAuthUserId(ctx);
     const event = await ctx.db.get(eventId);
-    if (!event) return [];
+    if (!event) return { photos: [], allowed: false };
     const canView =
       userId !== null &&
       (event.ownerId === userId || (await isRegistered(ctx, eventId, userId)));
-    if (!canView) return [];
+    if (!canView) return { photos: [], allowed: false };
 
     const photos = await ctx.db
       .query("gallery")
@@ -131,6 +131,6 @@ export const getPhotoUrls = query({
       else if (photo.imageUrl) url = photo.imageUrl;
       out.push({ photo, url });
     }
-    return out;
+    return { photos: out, allowed: canView };
   },
 });

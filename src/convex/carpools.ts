@@ -5,6 +5,7 @@ import { mutation, query } from "./_generated/server";
 export const listForEvent = query({
   args: { eventId: v.id("events") },
   handler: async (ctx, { eventId }) => {
+    const userId = await getAuthUserId(ctx);
     const carpools = await ctx.db
       .query("carpools")
       .withIndex("by_event", (q) => q.eq("eventId", eventId))
@@ -23,6 +24,7 @@ export const listForEvent = query({
         ownerName: owner?.name ?? "Participant",
         taken: seats.length,
         riders: seats.length,
+        joined: userId !== null && seats.some((s) => s.userId === userId),
       });
     }
     return out;

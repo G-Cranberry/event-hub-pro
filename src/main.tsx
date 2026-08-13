@@ -4,7 +4,9 @@ import { RequireAuth } from "@/components/RequireAuth";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
+import { AppShell } from "@/components/orbit/AppShell";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
+import { Navigate } from "react-router";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router";
 import "./index.css";
@@ -12,7 +14,21 @@ import "./index.css";
 // Lazy load route components for better code splitting
 const Landing = lazy(() => import("./pages/Landing.tsx"));
 const AuthPage = lazy(() => import("./pages/Auth.tsx"));
-const Dashboard = lazy(() => import("./pages/Dashboard.tsx"));
+const Home = lazy(() => import("./pages/Home.tsx"));
+const Events = lazy(() => import("./pages/Events.tsx"));
+const EventDetails = lazy(() => import("./pages/EventDetails.tsx"));
+const Transport = lazy(() => import("./pages/Transport.tsx"));
+const Gallery = lazy(() => import("./pages/Gallery.tsx"));
+const Passes = lazy(() => import("./pages/Passes.tsx"));
+const Certificates = lazy(() => import("./pages/Certificates.tsx"));
+const OrgEvents = lazy(() => import("./pages/OrgEvents.tsx"));
+const NewEvent = lazy(() => import("./pages/NewEvent.tsx"));
+const OrgEventHub = lazy(() => import("./pages/OrgEventHub.tsx"));
+const OrgLive = lazy(() => import("./pages/OrgLive.tsx"));
+const OrgScanner = lazy(() => import("./pages/OrgScanner.tsx"));
+const OrgFormBuilder = lazy(() => import("./pages/OrgFormBuilder.tsx"));
+const OrgCertificate = lazy(() => import("./pages/OrgCertificate.tsx"));
+const OrgGallery = lazy(() => import("./pages/OrgGallery.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -122,16 +138,167 @@ createRoot(document.getElementById("root")!).render(
               <Route path="/" element={<Landing />} />
               <Route
                 path="/auth"
-                element={<AuthPage redirectAfterAuth="/dashboard" />}
+                element={<AuthPage redirectAfterAuth="/home" />}
               />
+
+              {/* Authenticated product pages — AppShell provides the wheel nav */}
               <Route
-                path="/dashboard"
+                path="/home"
                 element={
                   <RequireAuth>
-                    <Dashboard />
+                    <AppShell>
+                      <Home />
+                    </AppShell>
                   </RequireAuth>
                 }
               />
+
+              {/* Participant */}
+              <Route
+                path="/events"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <Events />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/events/:id/transport"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <Transport />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/events/:id/gallery"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <Gallery />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/events/:id"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <EventDetails />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/passes"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <Passes />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/certificates"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <Certificates />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+
+              {/* Organizer */}
+              <Route
+                path="/org/events/new"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <NewEvent />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgEvents />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events/:id/live"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgLive />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events/:id/scanner"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgScanner />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events/:id/form"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgFormBuilder />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events/:id/certificate"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgCertificate />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events/:id/gallery"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgGallery />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events/:id"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgEventHub />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+
+              {/* Legacy dashboard redirects into the role-aware home */}
+              <Route path="/dashboard" element={<Navigate to="/home" replace />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
