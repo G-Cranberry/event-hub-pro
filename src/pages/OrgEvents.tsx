@@ -18,6 +18,7 @@ import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { TYPE_LABEL, fmtRange } from "@/lib/orbit";
+import { EventArt } from "@/components/orbit/EventArt";
 
 export default function OrgEvents() {
   const myEvents = useQuery(api.events.myEvents);
@@ -138,11 +139,8 @@ export default function OrgEvents() {
                 to={`/org/events/${event._id}`}
                 className="orb-card group block overflow-hidden"
               >
-                <div
-                  className="relative px-5 py-6"
-                  style={{ ["--cover-accent" as string]: event.accent }}
-                >
-                  <div className="orb-cover absolute inset-0" />
+                <div className="relative px-5 py-6">
+                  <EventArt seed={event._id} accent={event.accent} />
                   <div className="relative">
                     <div className="flex items-center justify-between">
                       <Badge className="border-white/20 bg-black/40 font-bold uppercase tracking-wider text-white backdrop-blur">

@@ -19,6 +19,7 @@ import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { TYPE_LABEL, fmtDate, fmtRange } from "@/lib/orbit";
 import { QrCode } from "@/components/orbit/QrCode";
+import { EventArt } from "@/components/orbit/EventArt";
 
 const PLATFORMS = [
   { label: "Web", icon: Globe },
@@ -379,33 +380,38 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="orb-card p-6"
+                className="orb-card overflow-hidden p-0"
               >
-                <div className="flex items-center justify-between">
-                  <span
-                    className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
-                    style={{
-                      color: event.accent,
-                      background: `${event.accent}1f`,
-                      border: `1px solid ${event.accent}55`,
-                    }}
-                  >
-                    {TYPE_LABEL[event.type]}
-                  </span>
-                  <span className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
-                    {fmtDate(event.startDate)}
-                  </span>
+                <div className="relative h-28">
+                  <EventArt seed={event._id} accent={event.accent} showOrbit={false} />
+                  <div className="absolute inset-x-0 bottom-0 flex items-end justify-between px-4 pb-2.5">
+                    <span
+                      className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider"
+                      style={{
+                        color: event.accent,
+                        background: `${event.accent}1f`,
+                        border: `1px solid ${event.accent}55`,
+                      }}
+                    >
+                      {TYPE_LABEL[event.type]}
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-white/50">
+                      {fmtDate(event.startDate)}
+                    </span>
+                  </div>
                 </div>
-                <h3 className="mt-4 font-display text-xl font-bold leading-tight text-white">
-                  {event.title}
-                </h3>
-                <p className="mt-2 line-clamp-2 text-xs leading-5 text-white/55">
-                  {event.tagline}
-                </p>
-                <p className="mt-5 flex items-center gap-1.5 text-[11px] text-white/45">
-                  <CalendarDays className="h-3.5 w-3.5 text-ember" />
-                  {fmtRange(event.startDate, event.endDate)} · {event.city}
-                </p>
+                <div className="p-6">
+                  <h3 className="font-display text-xl font-bold leading-tight text-white">
+                    {event.title}
+                  </h3>
+                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-white/55">
+                    {event.tagline}
+                  </p>
+                  <p className="mt-5 flex items-center gap-1.5 text-[11px] text-white/45">
+                    <CalendarDays className="h-3.5 w-3.5 text-ember" />
+                    {fmtRange(event.startDate, event.endDate)} · {event.city}
+                  </p>
+                </div>
               </motion.div>
             ))}
           </div>

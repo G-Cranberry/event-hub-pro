@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PassCard } from "@/components/orbit/PassCard";
+import { EventArt } from "@/components/orbit/EventArt";
 import { DynamicForm, initialValues, validateSchema, type FormValues } from "@/components/orbit/DynamicForm";
 import { TYPE_LABEL, fmtRange, isUpcoming } from "@/lib/orbit";
 import { cn } from "@/lib/utils";
@@ -142,11 +143,8 @@ export default function EventDetails() {
         transition={{ duration: 0.5 }}
         className="orb-card mt-4 overflow-hidden"
       >
-        <div
-          className="relative px-6 py-10 sm:px-10"
-          style={{ ["--cover-accent" as string]: event.accent }}
-        >
-          <div className="orb-cover absolute inset-0" />
+        <div className="relative px-6 py-10 sm:px-10">
+          <EventArt seed={event._id} accent={event.accent} />
           <div className="relative">
             <div className="flex flex-wrap items-center gap-2">
               <Badge

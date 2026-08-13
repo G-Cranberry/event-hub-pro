@@ -21,6 +21,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Switch } from "@/components/ui/switch";
 import { TYPE_LABEL, fmtRange } from "@/lib/orbit";
+import { EventArt } from "@/components/orbit/EventArt";
 
 export default function OrgEventHub() {
   const { id = "" } = useParams();
@@ -115,8 +116,10 @@ export default function OrgEventHub() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="mt-4"
+        className="orb-card relative mt-4 overflow-hidden px-6 py-8 sm:px-10"
       >
+        <EventArt seed={event._id} accent={event.accent} showOrbit={false} />
+        <div className="relative">
         <div className="flex flex-wrap items-center gap-2">
           <Badge className="border-white/20 bg-black/40 font-bold uppercase tracking-wider text-white">
             {TYPE_LABEL[event.type]}
@@ -143,6 +146,7 @@ export default function OrgEventHub() {
         <p className="mt-2 text-sm text-white/55">
           {fmtRange(event.startDate, event.endDate)} · {event.venue}, {event.city}
         </p>
+        </div>
       </motion.div>
 
       {/* stats */}

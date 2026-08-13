@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/badge";
 import { CalendarDays, MapPin, Users } from "lucide-react";
 import { Link } from "react-router";
 import { TYPE_LABEL, daysUntil, fmtRange } from "@/lib/orbit";
+import { EventArt } from "./EventArt";
 
 type Event = Doc<"events">;
 
@@ -25,10 +26,8 @@ export function EventCard({
       onClick={() => sessionStorage.setItem("orbit:lastEvent", event._id)}
     >
       {/* cover */}
-      <div
-        className="orb-cover relative h-36"
-        style={{ ["--cover-accent" as string]: event.accent }}
-      >
+      <div className="relative h-36">
+        <EventArt seed={event._id} accent={event.accent} />
         <div className="absolute inset-0 flex items-end justify-between p-4">
           <div>
             <p className="font-display text-2xl font-bold leading-none text-white drop-shadow">
