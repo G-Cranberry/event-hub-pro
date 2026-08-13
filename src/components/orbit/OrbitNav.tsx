@@ -171,7 +171,7 @@ export function OrbitNav() {
                 width: radius * 2 + 148,
                 height: radius * 2 + 148,
                 background:
-                  "radial-gradient(circle at 50% 42%, oklch(0.24 0.025 265 / 0.85), oklch(0.13 0.015 265 / 0.92))",
+                  "radial-gradient(circle at 50% 42%, oklch(0.25 0.045 305 / 0.88), oklch(0.13 0.03 305 / 0.94))",
               }}
             >
               {/* ghost ticks: show the whole wheel rotating */}

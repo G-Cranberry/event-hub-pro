@@ -9,11 +9,11 @@ export function LoadingScreen() {
       initial={{ opacity: 1 }}
       exit={{ opacity: 0, scale: 1.06, filter: "blur(6px)" }}
       transition={{ duration: 0.55, ease: "easeInOut" }}
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0a0b0f]"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-[#0f0a18]"
     >
       {/* ambient glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,92,56,0.14),transparent_65%)]" />
+        <div className="absolute left-1/2 top-1/2 h-[560px] w-[560px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,rgba(255,160,60,0.16),transparent_65%)]" />
       </div>
 
       {/* orbiting loader mark */}
@@ -28,7 +28,7 @@ export function LoadingScreen() {
         />
         {/* orbiting dot */}
         <div className="orb-spin-slow absolute inset-0" style={{ animationDuration: "2.2s" }}>
-          <span className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ember shadow-[0_0_18px_4px_rgba(255,92,56,0.6)]" />
+          <span className="absolute left-1/2 top-0 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ember shadow-[0_0_18px_4px_rgba(255,160,60,0.65)]" />
         </div>
         <div className="absolute left-1/2 top-1/2 h-10 w-10 -translate-x-1/2 -translate-y-1/2 rounded-full border border-white/10 bg-white/5 backdrop-blur" />
       </div>
