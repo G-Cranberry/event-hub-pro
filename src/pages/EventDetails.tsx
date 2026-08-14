@@ -73,7 +73,7 @@ export default function EventDetails() {
 
     const missing = validateSchema(event.formSchema, values);
     if (missing) {
-      setError(`"${missing}" is required`);
+      setError(`* "${missing}" is required`);
       return;
     }
     if (regType === "team" && !teamName.trim()) {
