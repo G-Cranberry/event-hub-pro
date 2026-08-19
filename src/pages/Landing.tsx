@@ -21,6 +21,7 @@ import { TYPE_LABEL, fmtDate, fmtRange } from "@/lib/orbit";
 import { QrCode } from "@/components/orbit/QrCode";
 import { EventArt } from "@/components/orbit/EventArt";
 import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
+import { FloatingCards } from "@/components/orbit/FloatingCards";
 
 const PLATFORMS = [
   { label: "Web", icon: Globe },
@@ -152,6 +153,8 @@ export default function Landing() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
+      {/* floating background cards — KAMUI-style */}
+      <FloatingCards />
       {/* particle canvas background */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <ParticleCanvas count={70} color="mixed" />
