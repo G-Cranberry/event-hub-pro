@@ -7,291 +7,371 @@ import {
   Bus,
   CalendarDays,
   Camera,
-  LayoutGrid,
+  CheckCircle,
+  Globe,
+  Mail,
+  MapPin,
+  Orbit,
+  QrCode,
   ScanLine,
+  Sparkles,
   Ticket,
+  Users,
 } from "lucide-react";
 import { Link } from "react-router";
-import { useAuth } from "@/hooks/use-auth";
-import { useProfile } from "@/components/orbit/ProfileProvider";
-import { ModeSwitcher } from "@/components/orbit/ModeSwitcher";
-import { EventCard } from "@/components/orbit/EventCard";
-import { PassCard } from "@/components/orbit/PassCard";
 import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
 import { CardCarousel, CinematicBg } from "@/components/orbit/CardCarousel";
-import { fmtDate } from "@/lib/orbit";
+
+const FEATURES = [
+  {
+    icon: CalendarDays,
+    title: "Event Discovery",
+    desc: "Browse upcoming events with rich posters, detailed info, and one-click registration. Never miss what matters.",
+    color: "text-ember",
+    bg: "bg-ember/10",
+    border: "border-ember/40",
+    to: "/events",
+  },
+  {
+    icon: Ticket,
+    title: "Digital Pass",
+    desc: "Every registration gives you a unique QR pass stored in your wallet. Show it at the door — scan and go.",
+    color: "text-accent",
+    bg: "bg-accent/10",
+    border: "border-accent/40",
+    to: "/passes",
+  },
+  {
+    icon: ScanLine,
+    title: "Live Scanning",
+    desc: "Organizers scan passes at the door with instant validation. Track entries, advance rounds, manage capacity in real time.",
+    color: "text-amber-300",
+    bg: "bg-amber-300/10",
+    border: "border-amber-300/40",
+    to: "/events",
+  },
+  {
+    icon: QrCode,
+    title: "Dynamic Forms",
+    desc: "Organizers design custom registration forms field by field. Individual or team sign-ups, fully flexible.",
+    color: "text-ember",
+    bg: "bg-ember/10",
+    border: "border-ember/40",
+    to: "/events",
+  },
+  {
+    icon: Award,
+    title: "Certificates",
+    desc: "Download personalized attendance or achievement certificates. Customizable templates for every event.",
+    color: "text-gold",
+    bg: "bg-gold/10",
+    border: "border-gold/40",
+    to: "/certificates",
+  },
+  {
+    icon: Camera,
+    title: "Photo Galleries",
+    desc: "Organizers upload event photos, participants relive the day. A shared visual memory of every gathering.",
+    color: "text-accent",
+    bg: "bg-accent/10",
+    border: "border-accent/40",
+    to: "/events",
+  },
+];
+
+const HOW_IT_WORKS = [
+  { step: "01", title: "Sign Up", desc: "Create your account in seconds with email OTP. One account, two modes — participant and organizer.", icon: Users },
+  { step: "02", title: "Discover & Register", desc: "Browse events, fill organizer-designed forms, and grab your digital pass instantly.", icon: Ticket },
+  { step: "03", title: "Attend & Scan", desc: "Show your QR at the door. Scan validates your pass and marks attendance live.", icon: QrCode },
+  { step: "04", title: "Collect & Share", desc: "Download certificates, browse photo galleries, and share your event memories.", icon: Award },
+];
+
+const PLATFORMS = [
+  { label: "Web", icon: Globe },
+  { label: "Mobile", icon: Orbit },
+  { label: "Tablet", icon: Orbit },
+];
 
 export default function Home() {
-  const { user } = useAuth();
-  const { profile } = useProfile();
-  const myRegs = useQuery(api.registrations.myRegistrations);
   const events = useQuery(api.events.listPublished);
-
-  const upcoming = (events ?? []).filter((e) => e.endDate > Date.now()).slice(0, 3);
-  const passes = myRegs ?? [];
-  const mode = profile?.currentMode ?? "participant";
-  const firstName = (user?.name ?? user?.email ?? "").split(/[\s@]/)[0];
-
-  const stats = [
-    { label: "My passes", value: passes.length, icon: Ticket, color: "text-ember", to: "/passes" },
-    {
-      label: "Upcoming events",
-      value: upcoming.length,
-      icon: CalendarDays,
-      color: "text-accent",
-      to: "/events",
-    },
-    {
-      label: "Certificates",
-      value: passes.filter((p) => p.event.certificate?.enabled).length,
-      icon: Award,
-      color: "text-amber-300",
-      to: "/certificates",
-    },
-  ];
+  const upcoming = (events ?? []).filter((e) => e.endDate > Date.now()).slice(0, 5);
 
   return (
-    <div className="relative mx-auto min-h-screen max-w-6xl px-5 pb-24 pt-24 sm:pt-28">
+    <div className="relative min-h-screen overflow-hidden">
       {/* particle bg */}
       <div className="pointer-events-none absolute inset-0 z-0">
-        <ParticleCanvas count={35} color="ember" />
+        <ParticleCanvas count={50} color="mixed" />
       </div>
+      {/* ambient glow */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[600px] bg-[radial-gradient(800px_400px_at_60%_-5%,oklch(0.74_0.16_50/0.12),transparent_60%)]" />
       {/* scan line overlay */}
       <div className="orb-scanlines pointer-events-none absolute inset-0 z-[1] opacity-20" />
 
-      {/* header */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="relative z-10"
-      >
-        <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-ember">
-          <span className="orb-hud-blink h-1.5 w-1.5 rounded-full bg-ember" />
-          Mission control
-        </p>
-        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
-          Welcome back{firstName ? `, ${firstName}` : ""}
-        </h1>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/55">
-          {mode === "organizer"
-            ? "You're in Organizer mode — run your events from here."
-            : "Your event orbit, at a glance. Pick up where you left off."}
-        </p>
-      </motion.div>
-
-      {/* mode switcher */}
-      {profile && profile.isParticipant && profile.isOrganizer && (
+      {/* ─── Hero ─── */}
+      <section className="relative z-10 mx-auto max-w-6xl px-5 pt-24 sm:pt-28">
         <motion.div
-          initial={{ opacity: 0, y: 16 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.06 }}
-          className="mt-8"
+          transition={{ duration: 0.6 }}
         >
-          <ModeSwitcher />
+          <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.32em] text-ember">
+            <span className="orb-hud-blink h-1.5 w-1.5 rounded-full bg-ember" />
+            <span className="h-px w-8 bg-ember/60" />
+            Event Management Portal
+          </p>
+          <h1 className="mt-5 font-display text-4xl font-bold leading-[1.06] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
+            Every event,
+            <br />
+            <span className="text-gradient-ember">in one orbit</span>
+          </h1>
+          <p className="mt-5 max-w-xl text-[15px] leading-7 text-foreground/60">
+            ORBIT unifies registration, digital passes, live scanning, certificates,
+            and galleries into a single immersive platform — built for participants
+            and organizers alike.
+          </p>
         </motion.div>
-      )}
 
-      {/* 3D card carousel */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6, delay: 0.1 }}
-        className="relative z-10 mt-8"
-      >
-        <CinematicBg>
-          <div className="px-4 py-8 sm:px-8 sm:py-12">
-            <CardCarousel events={upcoming} />
-          </div>
-        </CinematicBg>
-      </motion.div>
-
-      {/* stats */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.12 }}
-        className="relative z-10 mt-8 grid grid-cols-3 gap-3 sm:gap-4"
-      >
-        {stats.map(({ label, value, icon: Icon, color, to }) => (
-          <Link
-            key={label}
-            to={to}
-            className="orb-card orb-neon-border orb-hud-corners group flex flex-col justify-between p-4 sm:p-5"
-          >
-            <Icon className={`h-5 w-5 ${color}`} />
-            <div className="mt-6">
-              <p className="font-display text-3xl font-bold text-foreground">{value}</p>
-              <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-foreground/45">
-                {label}
-              </p>
+        {/* ─── 3D Card Carousel ─── */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.15 }}
+          className="mt-10"
+        >
+          <CinematicBg>
+            <div className="px-4 py-8 sm:px-8 sm:py-12">
+              <CardCarousel events={upcoming} />
             </div>
-          </Link>
-        ))}
-      </motion.div>
+          </CinematicBg>
+        </motion.div>
+      </section>
 
-      {/* quick launch */}
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.18 }}
-        className="mt-12"
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold text-foreground">
-            {mode === "organizer" ? "Organizer toolkit" : "Quick launch"}
+      {/* ─── Features Grid ─── */}
+      <section className="relative z-10 mx-auto max-w-6xl px-5 py-20">
+        <div className="mb-10 text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-ember">
+            What ORBIT does
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">
+            Everything you need, <span className="text-gradient-ember">nothing you don't</span>
           </h2>
+          <p className="mt-3 max-w-lg mx-auto text-sm leading-6 text-foreground/55">
+            A complete event lifecycle — from discovery to certificate — in one
+            seamless experience.
+          </p>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-          {[
-            {
-              label: "Explore events",
-              desc: "Find your next one",
-              icon: CalendarDays,
-              to: "/events",
-              accent: "border-ember/40 text-ember",
-            },
-            {
-              label: "My passes",
-              desc: "Wallet & QR",
-              icon: Ticket,
-              to: "/passes",
-              accent: "border-ember/30 text-ember",
-            },
-            {
-              label: "Certificates",
-              desc: "Download PDFs",
-              icon: Award,
-              to: "/certificates",
-              accent: "border-gold/40 text-gold",
-            },
-            ...(mode === "organizer"
-              ? [
-                  {
-                    label: "Manage events",
-                    desc: "Create & run",
-                    icon: LayoutGrid,
-                    to: "/org/events",
-                    accent: "border-ember/40 text-ember",
-                  },
-                  {
-                    label: "QR scanner",
-                    desc: "Check passes in",
-                    icon: ScanLine,
-                    to: "/org/events",
-                    accent: "border-accent/40 text-accent",
-                  },
-                ]
-              : [
-                  {
-                    label: "Photo galleries",
-                    desc: "Relive the day",
-                    icon: Camera,
-                    to: "/events",
-                    accent: "border-ember/30 text-ember",
-                  },
-                  {
-                    label: "Transport",
-                    desc: "Buses & carpools",
-                    icon: Bus,
-                    to: "/events",
-                    accent: "border-gold/40 text-gold",
-                  },
-                ]),
-          ].map(({ label, desc, icon: Icon, to, accent }) => (
-            <Link key={label} to={to} className="orb-card orb-neon-border group p-4">
-              <span
-                className={`flex h-10 w-10 items-center justify-center rounded-xl border bg-black/30 ${accent}`}
+
+        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {FEATURES.map(({ icon: Icon, title, desc, color, bg, border, to }, i) => (
+            <motion.div
+              key={title}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: i * 0.06 }}
+            >
+              <Link
+                to={to}
+                className="orb-card orb-neon-border orb-hud-corners group block h-full p-6 transition-transform hover:-translate-y-0.5"
               >
-                <Icon className="h-5 w-5" />
-              </span>
-              <p className="mt-3 text-sm font-bold text-foreground">{label}</p>
-              <p className="mt-0.5 text-[11px] text-foreground/45">{desc}</p>
-            </Link>
+                <span className={`flex h-12 w-12 items-center justify-center rounded-xl border ${bg} ${border}`}>
+                  <Icon className={`h-5 w-5 ${color}`} />
+                </span>
+                <h3 className="mt-4 font-display text-lg font-bold text-foreground">{title}</h3>
+                <p className="mt-2 text-sm leading-6 text-foreground/55">{desc}</p>
+              </Link>
+            </motion.div>
           ))}
         </div>
-      </motion.div>
+      </section>
 
-      {/* latest pass */}
-      {passes.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.24 }}
-          className="relative z-10 mt-12"
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-foreground">Latest pass</h2>
-            <Link
-              to="/passes"
-              className="flex items-center gap-1 text-xs font-semibold text-ember hover:underline"
+      {/* ─── How It Works ─── */}
+      <section className="relative z-10 mx-auto max-w-5xl px-5 py-20">
+        <div className="mb-12 text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-ember">
+            How it works
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">
+            From signup to <span className="text-gradient-ember">certificate</span>
+          </h2>
+        </div>
+
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {HOW_IT_WORKS.map(({ step, title, desc, icon: Icon }, i) => (
+            <motion.div
+              key={step}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.45, delay: i * 0.08 }}
+              className="orb-card orb-neon-border group relative p-6"
             >
-              View wallet <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-          <div className="max-w-2xl">
-            <PassCard reg={passes[0].registration} event={passes[0].event} />
-          </div>
-        </motion.div>
-      )}
+              <span className="font-display text-4xl font-bold text-ember/15">{step}</span>
+              <span className="mt-3 flex h-10 w-10 items-center justify-center rounded-xl border border-ember/30 bg-ember/10">
+                <Icon className="h-5 w-5 text-ember" />
+              </span>
+              <h3 className="mt-3 font-display text-base font-bold text-foreground">{title}</h3>
+              <p className="mt-2 text-sm leading-5 text-foreground/55">{desc}</p>
+            </motion.div>
+          ))}
+        </div>
+      </section>
 
-      {/* upcoming events */}
-      {upcoming.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="relative z-10 mt-12"
-        >
-          <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-foreground">Up next</h2>
-            <Link
-              to="/events"
-              className="flex items-center gap-1 text-xs font-semibold text-ember hover:underline"
-            >
-              All events <ArrowRight className="h-3.5 w-3.5" />
-            </Link>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {upcoming.map((event) => {
-              const reg = passes.find((p) => p.event._id === event._id);
-              return (
-                <EventCard
-                  key={event._id}
-                  event={event}
-                  registered={!!reg}
-                  ended={event.endDate < Date.now()}
-                />
-              );
-            })}
-          </div>
-        </motion.div>
-      )}
-
-      {upcoming.length === 0 && passes.length === 0 && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3 }}
-          className="orb-card orb-neon-border orb-hud-corners relative z-10 mt-12 flex flex-col items-center gap-4 p-10 text-center"
-        >
-          <span className="flex h-14 w-14 items-center justify-center rounded-full border border-ember/40 bg-ember/10">
-            <CalendarDays className="h-6 w-6 text-ember" />
-          </span>
-          <div>
-            <p className="font-display text-lg font-bold text-foreground">Your orbit is empty</p>
-            <p className="mt-1 text-sm text-foreground/55">
-              {fmtDate(Date.now())} — discover an event and grab your first pass.
+      {/* ─── Two Modes ─── */}
+      <section className="relative z-10 mx-auto max-w-5xl px-5 py-20">
+        <div className="mb-10 text-center">
+          <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-ember">
+            Two worlds, one account
+          </p>
+          <h2 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">
+            Choose your <span className="text-gradient-ember">mode</span>
+          </h2>
+        </div>
+        <div className="grid gap-6 sm:grid-cols-2">
+          <Link to="/auth?returnTo=%2Fevents" className="orb-card orb-hud-corners orb-scanlines group block p-8">
+            <div className="flex items-center gap-3">
+              <span className="orb-neon-border flex h-12 w-12 items-center justify-center rounded-xl bg-ember/10 text-ember">
+                <Users className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-display text-xl font-bold text-foreground">Participant</p>
+                <p className="text-xs uppercase tracking-widest text-foreground/40">Discover · Register · Attend</p>
+              </div>
+            </div>
+            <p className="mt-5 text-sm leading-6 text-foreground/60">
+              Browse events, fill organizer-designed forms, carry your pass in a wallet, track
+              round results, grab seats in carpools, and download certificates.
             </p>
-          </div>
-          <Link
-            to="/events"
-            className="rounded-full bg-ember px-6 py-2.5 text-sm font-bold text-[#160a04] hover:bg-ember/90"
-          >
-            Browse events
+            <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-ember">
+              Enter as participant
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
           </Link>
-        </motion.div>
-      )}
+
+          <Link to="/auth?returnTo=%2Forg%2Fevents" className="orb-card orb-hud-corners orb-scanlines group block p-8">
+            <div className="flex items-center gap-3">
+              <span className="orb-neon-border flex h-12 w-12 items-center justify-center rounded-xl bg-gold/10 text-gold">
+                <Sparkles className="h-5 w-5" />
+              </span>
+              <div>
+                <p className="font-display text-xl font-bold text-foreground">Organizer</p>
+                <p className="text-xs uppercase tracking-widest text-foreground/40">Create · Scan · Manage</p>
+              </div>
+            </div>
+            <p className="mt-5 text-sm leading-6 text-foreground/60">
+              Design registration forms field by field, watch registrations land live, scan
+              passes at the door, advance teams between rounds, and publish certificates and galleries.
+            </p>
+            <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-gold">
+              Enter as organizer
+              <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </span>
+          </Link>
+        </div>
+      </section>
+
+      {/* ─── CTA ─── */}
+      <section className="relative z-10 mx-auto max-w-5xl px-5 py-16">
+        <div className="orb-card orb-neon-border orb-hud-corners orb-scanlines relative overflow-hidden p-10 text-center sm:p-14">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(500px_300px_at_50%_0%,oklch(0.74_0.16_50/0.1),transparent)]" />
+          <h2 className="relative font-display text-2xl font-bold text-foreground sm:text-3xl">
+            Ready to enter the orbit?
+          </h2>
+          <p className="relative mt-3 text-sm leading-6 text-foreground/55">
+            Sign up for free, discover events, and carry your passes everywhere.
+          </p>
+          <div className="relative mt-6 flex flex-col items-center justify-center gap-3 sm:flex-row">
+            <Link
+              to="/auth?returnTo=%2Fevents"
+              className="rounded-full bg-ember px-7 py-3 text-sm font-bold text-[#1a0d02] shadow-[0_10px_30px_-8px_rgba(255,120,50,0.6)] hover:bg-ember/90"
+            >
+              Get started free
+            </Link>
+            <Link
+              to="/auth?returnTo=%2Forg%2Fevents"
+              className="rounded-full border border-foreground/20 bg-foreground/5 px-7 py-3 text-sm font-bold text-foreground hover:bg-foreground/10"
+            >
+              I'm an organizer
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* ─── Footer ─── */}
+      <footer className="relative z-10 border-t border-foreground/10 px-5 py-12">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            {/* brand */}
+            <div>
+              <Link to="/" className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ember/15">
+                  <Orbit className="h-4 w-4 text-ember" />
+                </span>
+                <span className="font-display text-lg font-bold tracking-[0.2em] text-foreground">ORBIT</span>
+              </Link>
+              <p className="mt-3 text-sm leading-5 text-foreground/50">
+                Every event, in one orbit. A unified platform for registration, digital passes, and certificates.
+              </p>
+            </div>
+
+            {/* quick links */}
+            <div>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-foreground/40">Explore</h4>
+              <ul className="space-y-2">
+                {[{ label: "Events", to: "/events" }, { label: "Passes", to: "/passes" }, { label: "Certificates", to: "/certificates" }].map((l) => (
+                  <li key={l.label}>
+                    <Link to={l.to} className="text-sm text-foreground/55 transition-colors hover:text-ember">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* organizer */}
+            <div>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-foreground/40">Organizers</h4>
+              <ul className="space-y-2">
+                {[{ label: "Create Event", to: "/org/events/new" }, { label: "My Events", to: "/org/events" }, { label: "Form Builder", to: "/org/events" }].map((l) => (
+                  <li key={l.label}>
+                    <Link to={l.to} className="text-sm text-foreground/55 transition-colors hover:text-ember">{l.label}</Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* contact */}
+            <div>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-foreground/40">Connect</h4>
+              <ul className="space-y-2">
+                <li className="flex items-center gap-2 text-sm text-foreground/55">
+                  <Mail className="h-3.5 w-3.5 text-ember" />
+                  hello@orbit.events
+                </li>
+                <li className="flex items-center gap-2 text-sm text-foreground/55">
+                  <Globe className="h-3.5 w-3.5 text-ember" />
+                  orbit.events
+                </li>
+                <li className="flex items-center gap-2 text-sm text-foreground/55">
+                  <MapPin className="h-3.5 w-3.5 text-ember" />
+                  Built with Convex
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-foreground/10 pt-6 sm:flex-row">
+            <p className="text-[11px] text-foreground/35">
+              © {new Date().getFullYear()} ORBIT · Event Management Portal
+            </p>
+            <div className="flex items-center gap-4 text-[11px] text-foreground/35">
+              <Link to="/auth" className="transition-colors hover:text-foreground/60">Sign in</Link>
+              <span>·</span>
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground/60">GitHub</a>
+              <span>·</span>
+              <a href="https://convex.dev" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground/60">Convex</a>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
