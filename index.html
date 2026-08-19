@@ -1,58 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/logo.svg" />
+  <link rel="manifest" href="/manifest.webmanifest" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>ORBIT — Event Management Portal</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="/src/style.css" />
+  <title>Event Hub Pro</title>
 </head>
+
+
 <body>
-  <!-- Loading screen -->
-  <div id="loader" class="loader">
-    <div class="loader__grid"></div>
-    <div class="loader__scanlines"></div>
-    <div class="loader__hud-corners"></div>
-    <div class="loader__orbit">
-      <div class="loader__ring loader__ring--1"></div>
-      <div class="loader__ring loader__ring--2"></div>
-      <div class="loader__dot-orbit">
-        <span class="loader__dot"></span>
-      </div>
-      <div class="loader__core"></div>
-    </div>
-    <div class="loader__wordmark" id="loader-wordmark"></div>
-    <p class="loader__sub"><span class="hud-blink"></span> Event Management Portal</p>
-    <div class="loader__bar"><div class="loader__bar-fill"></div></div>
-  </div>
-
-  <!-- Main app shell -->
-  <div id="app" class="app hidden">
-    <canvas id="particles" class="particle-canvas"></canvas>
-    <div class="scanlines"></div>
-    <div id="page" class="page-container"></div>
-    <nav id="orbit-nav" class="orbit-nav">
-      <div class="orbit-nav__backdrop" id="nav-backdrop"></div>
-      <div class="orbit-nav__dial" id="nav-dial">
-        <div class="orbit-nav__ticks" id="nav-ticks"></div>
-        <div class="orbit-nav__items" id="nav-items"></div>
-        <div class="orbit-nav__hub">
-          <span class="orbit-nav__brand">ORBIT</span>
-          <span class="orbit-nav__mode" id="nav-mode">participant mode</span>
-          <span class="orbit-nav__hint">scroll · rotate</span>
-        </div>
-      </div>
-      <button class="orbit-nav__trigger" id="nav-trigger" aria-label="Open menu">
-        <span class="orbit-nav__trigger-ring"></span>
-        <span class="orbit-nav__trigger-inner"></span>
-        <span class="orbit-nav__trigger-dot"></span>
-        <span class="orbit-nav__trigger-satellite"></span>
-      </button>
-    </nav>
-  </div>
-
-  <script type="module" src="/src/main.js"></script>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
 </body>
+
 </html>
