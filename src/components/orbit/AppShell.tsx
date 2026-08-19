@@ -66,15 +66,19 @@ function TopControls() {
           {mode}
         </span>
       </button>
-      {/* Profile on right */}
-      <div className="glass flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3">
+      {/* Profile on right — clickable */}
+      <button
+        type="button"
+        onClick={() => navigate("/profile")}
+        className="glass flex items-center gap-2.5 rounded-full py-1 pl-1 pr-3 transition-colors hover:border-ember/50"
+      >
         <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-br from-ember to-gold text-xs font-bold text-white shadow-[0_0_12px_rgba(255,120,50,0.4)]">
           {initials}
         </span>
         <span className="hidden text-xs font-semibold text-foreground/85 sm:inline max-w-[80px] truncate">
           {displayName}
         </span>
-      </div>
+      </button>
       <button
         type="button"
         onClick={handleSignOut}
