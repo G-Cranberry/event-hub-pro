@@ -445,6 +445,26 @@
   100% { box-shadow: 0 0 0 0 oklch(0.78 0.18 45 / 0); }
 }
 
+/* Pulse ripple when toggling the orbit nav open/closed */
+@keyframes orb-ripple {
+  0% {
+    box-shadow: 0 0 0 0 oklch(0.78 0.18 45 / 0.6), 0 0 0 0 oklch(0.78 0.18 45 / 0.3);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 0 0 0 14px oklch(0.78 0.18 45 / 0), 0 0 0 28px oklch(0.78 0.18 45 / 0);
+    transform: scale(1.08);
+  }
+  100% {
+    box-shadow: 0 0 0 20px oklch(0.78 0.18 45 / 0), 0 0 0 40px oklch(0.78 0.18 45 / 0);
+    transform: scale(1);
+  }
+}
+
+.orb-ripple {
+  animation: orb-ripple 0.6s ease-out forwards;
+}
+
 /* Thin scrollbars for panel lists */
 .orb-scroll::-webkit-scrollbar {
   width: 6px;
