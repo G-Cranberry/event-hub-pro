@@ -20,7 +20,7 @@ import { fmtRange } from "@/lib/orbit";
 import { EventArt } from "@/components/orbit/EventArt";
 import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
 import { FloatingCards } from "@/components/orbit/FloatingCards";
-import { CardCarousel, CinematicBg } from "@/components/orbit/CardCarousel";
+
 
 const PLATFORMS = [
   { label: "Web", icon: Globe },
@@ -186,19 +186,7 @@ export default function Landing() {
           </motion.div>
         </div>
 
-        {/* right art — 3D card carousel */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.96 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-          className="pb-6"
-        >
-          <CinematicBg>
-            <div className="px-4 py-8 sm:px-8 sm:py-12">
-              <CardCarousel events={allEvents} />
-            </div>
-          </CinematicBg>
-        </motion.div>
+
       </main>
 
       {/* mode cards */}

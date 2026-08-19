@@ -18,6 +18,7 @@ import { ModeSwitcher } from "@/components/orbit/ModeSwitcher";
 import { EventCard } from "@/components/orbit/EventCard";
 import { PassCard } from "@/components/orbit/PassCard";
 import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
+import { CardCarousel, CinematicBg } from "@/components/orbit/CardCarousel";
 import { fmtDate } from "@/lib/orbit";
 
 export default function Home() {
@@ -90,6 +91,20 @@ export default function Home() {
           <ModeSwitcher />
         </motion.div>
       )}
+
+      {/* 3D card carousel */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="relative z-10 mt-8"
+      >
+        <CinematicBg>
+          <div className="px-4 py-8 sm:px-8 sm:py-12">
+            <CardCarousel events={upcoming} />
+          </div>
+        </CinematicBg>
+      </motion.div>
 
       {/* stats */}
       <motion.div
