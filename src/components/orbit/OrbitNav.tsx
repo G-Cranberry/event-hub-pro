@@ -46,9 +46,12 @@ const ORGANIZER_ITEMS: WheelItem[] = [
   { id: "events", label: "My Events", icon: LayoutGrid, to: "/org/events" },
   { id: "live", label: "Live Dashboard", icon: Activity, to: "/org/events", ctx: "live" },
   { id: "scanner", label: "QR Scanner", icon: ScanLine, to: "/org/events", ctx: "scanner" },
+  { id: "budget", label: "Budget", icon: Award, to: "/org/events", ctx: "budget" },
+  { id: "comms", label: "Announcements", icon: Images, to: "/org/events", ctx: "comms" },
+  { id: "feedback", label: "Feedback", icon: Menu, to: "/org/events", ctx: "feedback" },
   { id: "builder", label: "Form Builder", icon: Blocks, to: "/org/events", ctx: "builder" },
   { id: "certs", label: "Cert Designer", icon: Palette, to: "/org/events", ctx: "certdesigner" },
-  { id: "gallery", label: "Gallery Upload", icon: Images, to: "/org/events", ctx: "galleryupload" },
+  { id: "gallery", label: "Gallery Upload", icon: Camera, to: "/org/events", ctx: "galleryupload" },
 ];
 
 function resolveCtx(to: string, ctx?: string): string {
@@ -64,6 +67,9 @@ function resolveCtx(to: string, ctx?: string): string {
     case "builder": return lastEvent ? `/org/events/${lastEvent}/form` : "/org/events";
     case "certdesigner": return lastEvent ? `/org/events/${lastEvent}/certificate` : "/org/events";
     case "galleryupload": return lastEvent ? `/org/events/${lastEvent}/gallery` : "/org/events";
+    case "budget": return lastEvent ? `/org/events/${lastEvent}/budget` : "/org/events";
+    case "comms": return lastEvent ? `/org/events/${lastEvent}/communication` : "/org/events";
+    case "feedback": return lastEvent ? `/org/events/${lastEvent}/feedback` : "/org/events";
     default: return to;
   }
 }

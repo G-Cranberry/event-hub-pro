@@ -134,6 +134,70 @@ export default function OrgLive() {
         ))}
       </div>
 
+      {/* Scan Activity Pulse */}
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
+        className="mt-6 orb-card orb-neon-border p-6"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="relative flex h-3 w-3">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-accent opacity-75" />
+              <span className="relative inline-flex h-3 w-3 rounded-full bg-accent" />
+            </span>
+            <h2 className="font-display text-lg font-bold text-white">Scan Activity</h2>
+          </div>
+          <p className="text-[11px] text-white/45">Real-time check-in heatmap</p>
+        </div>
+        <div className="mt-4 grid grid-cols-24 gap-1" style={{ display: "grid", gridTemplateColumns: "repeat(24, 1fr)" }}>
+          {Array.from({ length: 24 }).map((_, hour) => {
+            const hourScans = regs.filter((r) => {
+              if (r.registration.status !== "attended") return false;
+              const d = new Date(r.registration.createdAt);
+              return d.getHours() === hour;
+            }).length;
+            const intensity = stats.attended > 0 ? hourScans / Math.max(stats.attended * 0.15, 1) : 0;
+            const clamped = Math.min(intensity, 1);
+            return (
+              <div
+                key={hour}
+                className="relative group"
+                title={`${hour}:00 — ${hourScans} check-ins`}
+              >
+                <div
+                  className="aspect-square rounded-sm transition-all duration-300"
+                  style={{
+                    background: hourScans === 0
+                      ? "rgba(255,255,255,0.03)"
+                      : `rgba(255, ${Math.round(120 - clamped * 80)}, ${Math.round(50 - clamped * 30)}, ${0.2 + clamped * 0.8})`,
+                    boxShadow: hourScans > 0 ? `0 0 ${4 + clamped * 12}px rgba(255,120,50,${clamped * 0.4})` : "none",
+                  }}
+                />
+                <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 text-[8px] text-white/30">
+                  {hour % 3 === 0 ? `${hour}` : ""}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+        <div className="mt-8 flex items-center gap-4 text-[10px] text-white/40">
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded-sm" style={{ background: "rgba(255,255,255,0.03)" }} />
+            <span>No scans</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded-sm" style={{ background: "rgba(255,120,50,0.3)" }} />
+            <span>Low</span>
+          </div>
+          <div className="flex items-center gap-1.5">
+            <div className="h-3 w-3 rounded-sm" style={{ background: "rgba(255,50,20,0.9)" }} />
+            <span>Peak</span>
+          </div>
+        </div>
+      </motion.div>
+
       {/* toolbar */}
       <div className="mt-8 flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
         <div className="flex flex-wrap gap-2">
