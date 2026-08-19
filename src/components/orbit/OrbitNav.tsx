@@ -12,7 +12,6 @@ import {
   Home,
   Images,
   LayoutGrid,
-  Orbit,
   Palette,
   ScanLine,
   Ticket,
@@ -76,11 +75,47 @@ function resolveCtx(to: string, ctx?: string): string {
   }
 }
 
-/**
- * Quarter-circle wheel anchored at bottom-right corner.
- * Items are laid out along an arc (90° to 180° range = bottom-right quadrant).
- * Scroll rotates the visible items along the arc.
- */
+// ── Geometry constants ──────────────────────────────────────────
+// The quarter-circle panel is anchored at the bottom-right of the
+// viewport. Its curved edge sweeps from the bottom-left corner of
+// the panel up to the top-right corner.
+//
+// We define a local coordinate system whose origin (0, 0) is the
+// bottom-right corner of the panel (the anchor point).
+//   • +X goes LEFT  (into the viewport)
+//   • +Y goes UP    (into the viewport)
+//
+// Items are placed at distance RADIUS from the origin at angles
+// from 0° (straight left) to 90° (straight up).
+
+const PANEL_SIZE = 420; // px — diameter of the quarter circle + padding
+const RADIUS = 170; // px — distance from corner origin to items
+const ARC_DEG_START = 5; // degrees from the left edge (bottom)
+const ARC_DEG_END = 85; // degrees from the left edge (top/right)
+const ARC_DEG_SPAN = ARC_DEG_END - ARC_DEG_START;
+const MAX_VISIBLE = 5; // items visible at once
+
+function degToRad(deg: number) {
+  return (deg * Math.PI) / 180;
+}
+
+/** Convert an arc angle (0°=left, 90°=up) to panel-local pixel coords. */
+function arcToPixel(angleDeg: number): { px: number; py: number } {
+  const rad = degToRad(angleDeg);
+  // +X = left, +Y = up → pixel coords from top-left of panel
+  const px = PANEL_SIZE - RADIUS * Math.cos(rad); // from left edge
+  const py = PANEL_SIZE - RADIUS * Math.sin(rad); // from top edge
+  return { px, py };
+}
+
+/** Quarter-circle SVG arc path for the curved border. */
+function arcPath(): string {
+  const start = arcToPixel(ARC_DEG_START);
+  const end = arcToPixel(ARC_DEG_END);
+  // SVG arc: A rx ry x-rotation large-arc-flag sweep-flag x y
+  return `M ${start.px} ${start.py} A ${RADIUS} ${RADIUS} 0 0 0 ${end.px} ${end.py}`;
+}
+
 export function OrbitNav() {
   const { profile } = useProfile();
   const { user } = useAuth();
@@ -93,27 +128,21 @@ export function OrbitNav() {
   const mode = profile?.currentMode ?? "participant";
   const items = mode === "organizer" ? ORGANIZER_ITEMS : PARTICIPANT_ITEMS;
 
-  // Arc config: items spread across a 180° arc (from 180° up to 360° = bottom-right quadrant)
-  const ARC_START = 180; // degrees — left side of arc (bottom)
-  const ARC_END = 360; // degrees — right side of arc (right edge)
-  const ARC_SPAN = ARC_END - ARC_START; // 180° sweep
-  const RADIUS = 160; // distance from the corner origin
-
-  // Normalize scroll offset
-  const maxOffset = Math.max(0, (items.length - 5) * 28);
+  // Scroll offset controls which slice of items is visible on the arc
+  const maxOffset = Math.max(0, items.length - MAX_VISIBLE);
   const clampedOffset = Math.min(Math.max(scrollOffset, 0), maxOffset);
 
   useEffect(() => {
     setOpen(false);
   }, [location.pathname]);
 
-  // Scroll handler when open
+  // Scroll / keyboard handlers when open
   useEffect(() => {
     if (!open) return;
     const onWheel = (e: WheelEvent) => {
       e.preventDefault();
       setScrollOffset((prev) => {
-        const next = prev + e.deltaY * 0.35;
+        const next = prev + (e.deltaY > 0 ? 0.4 : -0.4);
         return Math.min(Math.max(next, 0), maxOffset);
       });
     };
@@ -135,31 +164,31 @@ export function OrbitNav() {
 
   const activePath = location.pathname;
 
-  // Compute item positions along the quarter-circle arc
+  // Position items along the arc
   const positioned = useMemo(() => {
-    const visibleCount = 5;
-    const spacing = ARC_SPAN / (visibleCount + 1);
+    // Spread items evenly across the arc span
+    const spacing = ARC_DEG_SPAN / (MAX_VISIBLE - 1 || 1);
 
     return items.map((item, i) => {
-      // Each item gets a position along the arc based on index minus scroll
-      const itemAngle = ARC_START + (i + 1) * spacing - clampedOffset * (spacing / 28);
-      const isWithinArc = itemAngle >= ARC_START - 5 && itemAngle <= ARC_END + 5;
+      // Map item index to an arc angle, offset by scroll
+      const angle = ARC_DEG_START + (i - clampedOffset) * spacing;
 
-      const rad = (itemAngle * Math.PI) / 180;
-      const x = RADIUS * Math.cos(rad);
-      const y = RADIUS * Math.sin(rad);
+      // Is this item within the visible arc range?
+      const visible = angle >= ARC_DEG_START - 2 && angle <= ARC_DEG_END + 2;
 
-      // Fade edges
-      const centerAngle = (ARC_START + ARC_END) / 2;
-      const distFromCenter = Math.abs(itemAngle - centerAngle);
-      const fade = isWithinArc ? Math.max(0, 1 - distFromCenter / (ARC_SPAN / 2 + 10)) : 0;
+      // Fade at edges
+      const center = (ARC_DEG_START + ARC_DEG_END) / 2;
+      const dist = Math.abs(angle - center);
+      const fade = visible ? Math.max(0, 1 - (dist / (ARC_DEG_SPAN / 2 + 8)) * 0.6) : 0;
+
+      const { px, py } = visible ? arcToPixel(Math.max(ARC_DEG_START, Math.min(ARC_DEG_END, angle))) : arcToPixel(center);
 
       const resolvedPath = resolveCtx(item.to, item.ctx);
       const isActive = activePath.startsWith(resolvedPath.split("/").slice(0, 3).join("/"));
 
-      return { item, x, y, visible: isWithinArc && fade > 0.05, fade, isActive, angle: itemAngle };
+      return { item, px, py, visible: visible && fade > 0.1, fade, isActive, angle };
     });
-  }, [items, clampedOffset, activePath, ARC_START, ARC_SPAN, RADIUS]);
+  }, [items, clampedOffset, activePath]);
 
   const displayName =
     profile?.name || user?.name || user?.email?.split("@")[0] || "User";
@@ -180,49 +209,65 @@ export function OrbitNav() {
               onClick={() => setOpen(false)}
             />
 
-            {/* Quarter-circle arc container */}
+            {/* Quarter-circle panel — anchored bottom-right */}
             <motion.div
               ref={containerRef}
-              initial={{ opacity: 0, scale: 0.3 }}
+              initial={{ opacity: 0, scale: 0.15 }}
               animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.3 }}
-              transition={{ type: "spring", stiffness: 280, damping: 24 }}
-              className="fixed bottom-0 right-0 z-50 overflow-hidden orb-scanlines"
+              exit={{ opacity: 0, scale: 0.15 }}
+              transition={{ type: "spring", stiffness: 300, damping: 26 }}
+              className="fixed bottom-0 right-0 z-50 orb-scanlines"
               style={{
-                width: RADIUS * 2 + 100,
-                height: RADIUS * 2 + 100,
+                width: PANEL_SIZE,
+                height: PANEL_SIZE,
                 background:
-                  "radial-gradient(ellipse at 100% 100%, oklch(0.22 0.04 305 / 0.92), oklch(0.10 0.025 305 / 0.96))",
+                  "radial-gradient(ellipse at 100% 100%, oklch(0.20 0.04 305 / 0.94), oklch(0.08 0.025 305 / 0.97))",
                 borderRadius: "100% 0 0 0",
-                border: "1px solid oklch(0.82 0.13 78 / 0.12)",
+                border: "1px solid oklch(0.82 0.13 78 / 0.10)",
                 borderTop: "none",
                 borderRight: "none",
                 transformOrigin: "100% 100%",
+                overflow: "hidden",
               }}
             >
-              {/* Ghost ticks along the arc */}
-              {items.map((_, i) => {
-                const visibleCount = 5;
-                const spacing = ARC_SPAN / (visibleCount + 1);
-                const angle = ARC_START + (i + 1) * spacing - clampedOffset * (spacing / 28);
-                if (angle < ARC_START - 10 || angle > ARC_END + 10) return null;
-                const rad = (angle * Math.PI) / 180;
-                const tx = RADIUS * Math.cos(rad);
-                const ty = RADIUS * Math.sin(rad);
-                return (
-                  <span
-                    key={`tick-${i}`}
-                    className="absolute h-1 w-1 rounded-full bg-white/8"
-                    style={{
-                      left: RADIUS + 50 + tx,
-                      top: RADIUS + 50 + ty,
-                    }}
-                  />
-                );
-              })}
+              {/* SVG arc border along the curved edge */}
+              <svg
+                className="pointer-events-none absolute inset-0 z-30"
+                width={PANEL_SIZE}
+                height={PANEL_SIZE}
+                viewBox={`0 0 ${PANEL_SIZE} ${PANEL_SIZE}`}
+              >
+                <path
+                  d={arcPath()}
+                  fill="none"
+                  stroke="oklch(0.74 0.16 50 / 0.20)"
+                  strokeWidth="1.5"
+                />
+                {/* Ghost tick marks along the arc */}
+                {items.map((_, i) => {
+                  const spacing = ARC_DEG_SPAN / (MAX_VISIBLE - 1 || 1);
+                  const angle = ARC_DEG_START + (i - clampedOffset) * spacing;
+                  if (angle < ARC_DEG_START - 5 || angle > ARC_DEG_END + 5)
+                    return null;
+                  const clamped = Math.max(
+                    ARC_DEG_START,
+                    Math.min(ARC_DEG_END, angle),
+                  );
+                  const { px, py } = arcToPixel(clamped);
+                  return (
+                    <circle
+                      key={`tick-${i}`}
+                      cx={px}
+                      cy={py}
+                      r="2"
+                      fill="oklch(1 0 0 / 0.08)"
+                    />
+                  );
+                })}
+              </svg>
 
-              {/* Nav items along the arc */}
-              {positioned.map(({ item, x, y, visible, fade, isActive }) => {
+              {/* Nav items along the arc circumference */}
+              {positioned.map(({ item, px, py, visible, fade, isActive }) => {
                 const Icon = item.icon;
                 return (
                   <button
@@ -231,63 +276,51 @@ export function OrbitNav() {
                     aria-hidden={!visible}
                     tabIndex={visible ? 0 : -1}
                     onClick={() => go(item)}
-                    className="absolute flex flex-col items-center gap-1.5 outline-none transition-all duration-200"
+                    className="absolute flex flex-col items-center gap-1.5 outline-none transition-all duration-300"
                     style={{
-                      left: RADIUS + 50 + x,
-                      top: RADIUS + 50 + y,
-                      transform: `translate(-50%, -50%) scale(${visible ? 1 : 0.4})`,
+                      left: px,
+                      top: py,
+                      transform: `translate(-50%, -50%) scale(${visible ? 1 : 0.3})`,
                       opacity: visible ? fade : 0,
                       pointerEvents: visible ? "auto" : "none",
                       zIndex: visible ? 10 : 0,
                     }}
                   >
                     <span
-                      className="flex h-14 w-14 items-center justify-center rounded-full border transition-all duration-200"
+                      className="flex h-12 w-12 items-center justify-center rounded-full border transition-all duration-200 sm:h-14 sm:w-14"
                       style={{
                         borderColor: isActive
                           ? "oklch(0.74 0.16 50 / 0.9)"
                           : "oklch(1 0 0 / 0.12)",
                         background: isActive
                           ? "oklch(0.74 0.16 50 / 0.2)"
-                          : "oklch(0 0 0 / 0.35)",
-                        color: isActive ? "oklch(0.74 0.16 50)" : "oklch(1 0 0 / 0.85)",
+                          : "oklch(0 0 0 / 0.40)",
+                        color: isActive
+                          ? "oklch(0.74 0.16 50)"
+                          : "oklch(1 0 0 / 0.85)",
                         boxShadow: isActive
-                          ? "0 0 24px oklch(0.74 0.16 50 / 0.4), 0 0 40px -8px oklch(0.74 0.16 50 / 0.2)"
+                          ? "0 0 20px oklch(0.74 0.16 50 / 0.35), 0 0 40px -8px oklch(0.74 0.16 50 / 0.15)"
                           : undefined,
                       }}
                     >
-                      <Icon className="h-5.5 w-5.5" />
+                      <Icon className="h-5 w-5 sm:h-5.5 sm:w-5.5" />
                     </span>
-                    <span className="whitespace-nowrap rounded-full border border-ember/20 bg-black/70 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-white/70 backdrop-blur">
+                    <span className="whitespace-nowrap rounded-full border border-ember/20 bg-black/70 px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider text-white/70 backdrop-blur sm:text-[9px]">
                       {item.label}
                     </span>
                   </button>
                 );
               })}
 
-              {/* Arc border line — SVG quarter-circle stroke */}
-              <svg
-                className="pointer-events-none absolute inset-0 z-30"
-                width={RADIUS * 2 + 100}
-                height={RADIUS * 2 + 100}
-              >
-                <path
-                  d={`M 0 ${RADIUS + 50} A ${RADIUS} ${RADIUS} 0 0 1 ${RADIUS + 50} 0`}
-                  fill="none"
-                  stroke="oklch(0.74 0.16 50 / 0.25)"
-                  strokeWidth="1.5"
-                />
-              </svg>
-
-              {/* Corner hub label */}
-              <div className="absolute bottom-4 right-4 z-20 flex flex-col items-end">
-                <span className="font-display text-sm font-bold tracking-[0.15em] text-white/80">
+              {/* Corner hub — brand label at the origin (bottom-right) */}
+              <div className="absolute bottom-3 right-3 z-20 flex flex-col items-end sm:bottom-4 sm:right-4">
+                <span className="font-display text-xs font-bold tracking-[0.15em] text-white/80 sm:text-sm">
                   ORBIT
                 </span>
-                <span className="text-[8px] font-semibold uppercase tracking-[0.3em] text-ember">
+                <span className="text-[7px] font-semibold uppercase tracking-[0.3em] text-ember sm:text-[8px]">
                   {mode}
                 </span>
-                <span className="mt-1 text-[8px] uppercase tracking-widest text-white/30">
+                <span className="mt-0.5 text-[7px] uppercase tracking-widest text-white/30 sm:text-[8px]">
                   scroll · rotate
                 </span>
               </div>
@@ -296,7 +329,7 @@ export function OrbitNav() {
         )}
       </AnimatePresence>
 
-      {/* Trigger button — anchored bottom-right */}
+      {/* Trigger button — bottom-right */}
       <button
         type="button"
         aria-label={open ? "Close menu" : "Open navigation"}
@@ -320,9 +353,7 @@ export function OrbitNav() {
         ) : (
           <span className="relative flex h-full w-full items-center justify-center">
             {user ? (
-              <span className="text-sm font-bold text-ember">
-                {initials}
-              </span>
+              <span className="text-sm font-bold text-ember">{initials}</span>
             ) : (
               <>
                 <span className="h-2.5 w-2.5 rounded-full bg-ember" />
