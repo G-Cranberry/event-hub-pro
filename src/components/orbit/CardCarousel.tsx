@@ -1,5 +1,4 @@
 import { useState, useCallback, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { TYPE_LABEL, fmtRange } from "@/lib/orbit";
@@ -20,36 +19,52 @@ export function CardCarousel({ events }: { events: Event[] }) {
   const isDragging = useRef(false);
 
   const total = events.length;
-  const prev = () => { setActive((a) => (a - 1 + total) % total); setFlipped({}); };
-  const next = () => { setActive((a) => (a + 1) % total); setFlipped({}); };
+
+  // Use a ref to avoid stale closures in event handlers
+  const totalRef = useRef(total);
+  totalRef.current = total;
+  const activeRef = useRef(active);
+  activeRef.current = active;
+  const flippedRef = useRef(flipped);
+  flippedRef.current = flipped;
+
+  const prev = useCallback(() => {
+    setActive((a) => (a - 1 + totalRef.current) % totalRef.current);
+    setFlipped({});
+  }, []);
+
+  const next = useCallback(() => {
+    setActive((a) => (a + 1) % totalRef.current);
+    setFlipped({});
+  }, []);
+
   const toggleFlip = useCallback((id: string) => {
-    if (isDragging.current) return; // don't flip on swipe
+    if (isDragging.current) return;
     setFlipped((f) => ({ ...f, [id]: !f[id] }));
   }, []);
 
-  if (total === 0) return null;
-
   // Drag/swipe handlers
-  const onPointerDown = (e: React.PointerEvent) => {
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
     dragStartX.current = e.clientX;
     dragDelta.current = 0;
     isDragging.current = false;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  };
-  const onPointerMove = (e: React.PointerEvent) => {
+  }, []);
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
     const dx = e.clientX - dragStartX.current;
     dragDelta.current = dx;
     if (Math.abs(dx) > 5) isDragging.current = true;
-  };
-  const onPointerUp = () => {
+  }, []);
+
+  const onPointerUp = useCallback(() => {
     const threshold = 50;
     if (dragDelta.current > threshold) prev();
     else if (dragDelta.current < -threshold) next();
-    // Reset after a tick so click handlers don't fire
     setTimeout(() => { isDragging.current = false; }, 10);
-  };
+  }, [prev, next]);
 
-  // Scroll wheel handler on the carousel area
+  // Scroll wheel handler — stable via refs, no dependency issues
   const onWheel = useCallback((e: React.WheelEvent) => {
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
       if (e.deltaX > 30) next();
@@ -58,7 +73,10 @@ export function CardCarousel({ events }: { events: Event[] }) {
       if (e.deltaY > 30) next();
       else if (e.deltaY < -30) prev();
     }
-  }, [total]);
+  }, [prev, next]);
+
+  // Early return AFTER all hooks — never before
+  if (total === 0) return null;
 
   // Build visible slots
   const getSlotIndex = (slot: "left" | "center" | "right") => {
