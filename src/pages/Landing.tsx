@@ -10,7 +10,6 @@ import {
   Smartphone,
   Sparkles,
   Tablet,
-  Ticket,
   UserCog,
   Users,
 } from "lucide-react";
@@ -18,10 +17,10 @@ import { Link } from "react-router";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { fmtRange } from "@/lib/orbit";
-import { QrCode } from "@/components/orbit/QrCode";
 import { EventArt } from "@/components/orbit/EventArt";
 import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
 import { FloatingCards } from "@/components/orbit/FloatingCards";
+import { CardCarousel, CinematicBg } from "@/components/orbit/CardCarousel";
 
 const PLATFORMS = [
   { label: "Web", icon: Globe },
@@ -33,116 +32,12 @@ const PLATFORMS = [
   { label: "Tablet", icon: Tablet },
 ];
 
-function ArtPanel() {
-  return (
-    <div className="relative mx-auto aspect-[4/5] w-full max-w-md sm:aspect-[5/6]">
-      {/* atmospheric backdrop */}
-      <div className="orb-scanlines absolute inset-0 overflow-hidden rounded-[2rem] border border-ember/30 bg-[#0e0a16]/80 shadow-[inset_0_0_60px_rgba(0,0,0,0.6),0_30px_90px_-30px_rgba(0,0,0,0.9)]">
-        {/* grid lines */}
-        <div
-          className="absolute inset-0 opacity-[0.06]"
-          style={{
-            backgroundImage:
-              "linear-gradient(oklch(0.74 0.16 50 / 0.3) 1px, transparent 1px), linear-gradient(90deg, oklch(0.74 0.16 50 / 0.3) 1px, transparent 1px)",
-            backgroundSize: "40px 40px",
-          }}
-        />
-        {/* data stream */}
-        <div className="orb-data-stream absolute inset-0 opacity-40" />
-
-        {/* orbit shrine */}
-        <div className="absolute left-1/2 top-1/2 h-[68%] w-[68%] -translate-x-1/2 -translate-y-1/2">
-          <div
-            className="orb-spin-slow absolute inset-0 rounded-full border border-dashed border-ember/30"
-            style={{ animationDuration: "46s" }}
-          />
-          <div
-            className="orb-spin-slow absolute inset-[11%] rounded-full border border-ember/15"
-            style={{ animationDuration: "30s", animationDirection: "reverse" }}
-          />
-          <div
-            className="orb-spin-slow absolute inset-[23%] rounded-full border border-gold/10"
-            style={{ animationDuration: "70s" }}
-          />
-          {/* satellites */}
-          <div className="orb-spin-slow absolute inset-0" style={{ animationDuration: "18s" }}>
-            <span className="absolute left-1/2 top-0 h-2.5 w-2.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-ember shadow-[0_0_20px_6px_rgba(255,120,50,0.7)]" />
-          </div>
-          <div className="orb-spin-slow absolute inset-[11%]" style={{ animationDuration: "27s", animationDirection: "reverse" }}>
-            <span className="absolute left-0 top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gold shadow-[0_0_14px_4px_rgba(232,182,76,0.6)]" />
-          </div>
-
-          {/* glowing core */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="absolute left-1/2 top-1/2 h-32 w-32 -translate-x-1/2 -translate-y-1/2 rounded-full bg-[radial-gradient(circle,oklch(0.85_0.16_50/0.55),oklch(0.74_0.16_50/0.2)_50%,transparent_75%)] blur-lg" />
-            <div className="orb-neon-border orb-neon-pulse relative flex h-24 w-24 items-center justify-center rounded-full border border-ember/50 bg-gradient-to-br from-[#1a0e24] to-[#0d0916]">
-              <Orbit className="h-9 w-9 text-ember" />
-            </div>
-          </div>
-        </div>
-
-        {/* HUD corner brackets */}
-        <div className="absolute left-3 top-3 h-6 w-6 border-t-2 border-l-2 border-ember/60" />
-        <div className="absolute right-3 top-3 h-6 w-6 border-t-2 border-r-2 border-ember/60" />
-        <div className="absolute bottom-3 left-3 h-6 w-6 border-b-2 border-l-2 border-ember/60" />
-        <div className="absolute bottom-3 right-3 h-6 w-6 border-b-2 border-r-2 border-ember/60" />
-
-        {/* floating pass cards */}
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="orb-float absolute right-4 top-7 w-32 sm:w-36"
-          style={{ animationDuration: "7s" }}
-        >
-          <div className="orb-neon-border rounded-xl bg-[#0e0a16]/90 p-2.5 shadow-[0_14px_40px_-12px_rgba(0,0,0,0.85)]">
-            <div className="rounded-md bg-white p-1">
-              <QrCode value="orb:demo:pass:1" size={88} className="w-full" />
-            </div>
-            <p className="mt-1.5 truncate text-[9px] font-bold uppercase tracking-widest text-ember">
-              Live pass · QR
-            </p>
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, y: 18 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.65, duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="orb-float absolute bottom-16 left-4 w-32 sm:w-36"
-          style={{ animationDuration: "8.5s", animationDelay: "1.2s" }}
-        >
-          <div className="orb-neon-border rounded-xl bg-[#0e0a16]/90 p-2.5 shadow-[0_14px_40px_-12px_rgba(0,0,0,0.85)]">
-            <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-lg border border-ember/40 bg-ember/15">
-                <Ticket className="h-4 w-4 text-ember" />
-              </span>
-              <div className="min-w-0">
-                <p className="truncate text-[10px] font-bold text-white">Aarambh Fest</p>
-                <p className="text-[8px] uppercase tracking-wider text-gold">Advanced ✦</p>
-              </div>
-            </div>
-            <div className="mt-2 h-px bg-gradient-to-r from-transparent via-ember/50 to-transparent" />
-            <p className="mt-1.5 text-[8px] uppercase tracking-widest text-white/40">
-              Round 2 · selected
-            </p>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* bottom label plate */}
-      <div className="absolute -bottom-4 left-1/2 flex -translate-x-1/2 items-center gap-2 whitespace-nowrap rounded-full border border-ember/40 bg-[#0e0a16]/90 px-4 py-1.5 text-[10px] font-bold uppercase tracking-[0.25em] text-ember backdrop-blur orb-border-glow">
-        <Sparkles className="h-3 w-3" /> Passes · Rounds · Certificates
-      </div>
-    </div>
-  );
-}
-
 export default function Landing() {
   const events = useQuery(api.events.listPublished);
   const seedDemo = useMutation(api.seed.seedDemo);
   const seededRef = useRef(false);
-  const upcoming = (events ?? []).filter((e) => e.endDate > Date.now()).slice(0, 3);
+  const allEvents = events ?? [];
+  const upcoming = allEvents.filter((e) => e.endDate > Date.now()).slice(0, 3);
 
   useEffect(() => {
     if (events !== undefined && events.length === 0 && !seededRef.current) {
@@ -291,14 +186,18 @@ export default function Landing() {
           </motion.div>
         </div>
 
-        {/* right art */}
+        {/* right art — 3D card carousel */}
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
           className="pb-6"
         >
-          <ArtPanel />
+          <CinematicBg>
+            <div className="px-4 py-8 sm:px-8 sm:py-12">
+              <CardCarousel events={allEvents} />
+            </div>
+          </CinematicBg>
         </motion.div>
       </main>
 

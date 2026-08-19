@@ -1,0 +1,224 @@
+/* ---- 3D Card Carousel ---- */
+.card-carousel {
+  position: relative;
+  perspective: 1200px;
+  width: 100%;
+  max-width: 540px;
+  height: 380px;
+  margin: 0 auto;
+}
+@media (min-width: 640px) {
+  .card-carousel { height: 440px; }
+}
+
+/* Individual card wrapper — positioned in 3D space */
+.card-carousel__slot {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 200px;
+  height: 290px;
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1),
+              opacity 0.6s ease;
+}
+@media (min-width: 640px) {
+  .card-carousel__slot {
+    width: 240px;
+    height: 340px;
+  }
+}
+
+/* Position states: left, center, right */
+.card-carousel__slot--left {
+  transform: translate(-140%, -50%) rotateY(18deg) scale(0.82);
+  opacity: 0.55;
+  z-index: 1;
+  filter: brightness(0.65);
+}
+.card-carousel__slot--center {
+  transform: translate(-50%, -50%) rotateY(0deg) scale(1);
+  opacity: 1;
+  z-index: 3;
+}
+.card-carousel__slot--right {
+  transform: translate(40%, -50%) rotateY(-18deg) scale(0.82);
+  opacity: 0.55;
+  z-index: 1;
+  filter: brightness(0.65);
+}
+/* Hidden cards */
+.card-carousel__slot--hidden {
+  transform: translate(-50%, -50%) rotateY(0deg) scale(0.5);
+  opacity: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* The actual card face */
+.card-3d {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+.card-3d--flipped {
+  transform: rotateY(180deg);
+}
+
+.card-3d__face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow:
+    0 25px 60px -15px rgba(0, 0, 0, 0.7),
+    0 0 40px -10px var(--card-glow, rgba(255, 120, 50, 0.2));
+}
+
+/* Front face */
+.card-3d__front {
+  background: var(--card-bg, #1a1028);
+}
+
+/* Back face — flipped 180deg */
+.card-3d__back {
+  transform: rotateY(180deg);
+  background: var(--card-bg, #1a1028);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 24px;
+  text-align: center;
+}
+
+/* Card inner glow on hover */
+.card-3d:hover .card-3d__face {
+  box-shadow:
+    0 30px 70px -15px rgba(0, 0, 0, 0.75),
+    0 0 50px -8px var(--card-glow, rgba(255, 120, 50, 0.35));
+}
+
+/* ---- Cinematic background ---- */
+.cinematic-bg {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(180deg, #0d0816 0%, #12081e 40%, #1a0e28 100%);
+}
+.cinematic-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 15% 85%, rgba(255, 120, 50, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(232, 182, 76, 0.1) 0%, transparent 45%),
+    radial-gradient(ellipse at 50% 100%, rgba(200, 100, 40, 0.08) 0%, transparent 50%);
+  pointer-events: none;
+}
+/* Candle glow spots */
+.candle-glow {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(40px);
+  mix-blend-mode: screen;
+}
+.candle-glow--1 {
+  width: 120px;
+  height: 120px;
+  bottom: 8%;
+  left: 12%;
+  background: radial-gradient(circle, rgba(255, 150, 60, 0.35), transparent 70%);
+  animation: candle-flicker 3s ease-in-out infinite alternate;
+}
+.candle-glow--2 {
+  width: 100px;
+  height: 100px;
+  bottom: 12%;
+  right: 15%;
+  background: radial-gradient(circle, rgba(232, 182, 76, 0.3), transparent 70%);
+  animation: candle-flicker 4s ease-in-out infinite alternate 1s;
+}
+.candle-glow--3 {
+  width: 80px;
+  height: 80px;
+  bottom: 5%;
+  left: 45%;
+  background: radial-gradient(circle, rgba(255, 120, 50, 0.25), transparent 70%);
+  animation: candle-flicker 3.5s ease-in-out infinite alternate 0.5s;
+}
+
+@keyframes candle-flicker {
+  0% { opacity: 0.6; transform: scale(0.95); }
+  50% { opacity: 1; transform: scale(1.05); }
+  100% { opacity: 0.75; transform: scale(0.98); }
+}
+
+/* Surface reflection under cards */
+.card-surface {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 40%;
+  background: linear-gradient(0deg, rgba(255, 120, 50, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+}
+
+/* Navigation controls */
+.card-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+.card-nav__btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 18px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(12px);
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  cursor: pointer;
+  transition: all 0.25s;
+}
+.card-nav__btn:hover {
+  border-color: rgba(255, 120, 50, 0.5);
+  color: rgba(255, 120, 50, 1);
+  background: rgba(255, 120, 50, 0.08);
+}
+.card-nav__dots {
+  display: flex;
+  gap: 6px;
+}
+.card-nav__dot {
+  width: 24px;
+  height: 3px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.15);
+  transition: all 0.35s;
+  cursor: pointer;
+  border: none;
+  padding: 0;
+}
+.card-nav__dot--active {
+  background: rgba(255, 120, 50, 0.8);
+  box-shadow: 0 0 10px rgba(255, 120, 50, 0.4);
+  width: 32px;
+}

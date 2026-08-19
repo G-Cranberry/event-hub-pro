@@ -1,5 +1,6 @@
 import '@vly-ai/integrations';
 import '@/components/orbit/theme.css';
+import '@/components/orbit/card-carousel.css';
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
 import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
