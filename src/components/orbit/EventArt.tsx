@@ -1,5 +1,7 @@
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";
+import { TYPE_LABEL } from "@/lib/orbit";
+import { fmtDate } from "@/lib/orbit";
 
 function hashSeed(str: string): number {
   let h = 2166136261;
@@ -18,188 +20,253 @@ function mulberry(seed: number) {
   };
 }
 
-function hexToRgba(hex: string, alpha: number): string {
+function hexToHSL(hex: string): { h: number; s: number; l: number } {
   const h = hex.replace("#", "");
-  const n = parseInt(
-    h.length === 3 ? h.split("").map((c) => c + c).join("") : h,
-    16,
-  );
-  const r = (n >> 16) & 255;
-  const g = (n >> 8) & 255;
-  const b = n & 255;
-  return `rgba(${r},${g},${b},${alpha})`;
+  const n = parseInt(h.length === 3 ? h.split("").map((c) => c + c).join("") : h, 16);
+  const r = ((n >> 16) & 255) / 255;
+  const g = ((n >> 8) & 255) / 255;
+  const b = (n & 255) / 255;
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const l = (max + min) / 2;
+  if (max === min) return { h: 0, s: 0, l: l * 100 };
+  const d = max - min;
+  const s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+  let hue = 0;
+  if (max === r) hue = ((g - b) / d + (g < b ? 6 : 0)) / 6;
+  else if (max === g) hue = ((b - r) / d + 2) / 6;
+  else hue = ((r - g) / d + 4) / 6;
+  return { h: hue * 360, s: s * 100, l: l * 100 };
 }
 
-type ArtScene = {
-  blobs: { x: number; y: number; r: number; o: number }[];
-  rings: { cx: number; cy: number; rx: number; ry: number; o: number; sw: number }[];
-  stars: { x: number; y: number; r: number; o: number }[];
-  core: { x: number; y: number; r: number };
-  orbit: { x: number; y: number; r: number; speed: number; reverse: boolean };
-};
-
-function buildScene(seed: string): ArtScene {
-  const rnd = mulberry(hashSeed(seed));
-  const blobs = Array.from({ length: 4 }, () => ({
-    x: 15 + rnd() * 70,
-    y: 15 + rnd() * 70,
-    r: 22 + rnd() * 30,
-    o: 0.18 + rnd() * 0.22,
-  }));
-  const rings = Array.from({ length: 3 }, () => ({
-    cx: 30 + rnd() * 40,
-    cy: 35 + rnd() * 35,
-    rx: 20 + rnd() * 34,
-    ry: 12 + rnd() * 22,
-    o: 0.22 + rnd() * 0.3,
-    sw: 0.6 + rnd() * 0.9,
-  }));
-  const stars = Array.from({ length: 26 }, () => ({
-    x: rnd() * 100,
-    y: rnd() * 100,
-    r: 0.4 + rnd() * 1.1,
-    o: 0.25 + rnd() * 0.6,
-  }));
-  const core = {
-    x: 32 + rnd() * 36,
-    y: 32 + rnd() * 36,
-    r: 7 + rnd() * 5,
-  };
-  return {
-    blobs,
-    rings,
-    stars,
-    core,
-    orbit: { x: core.x, y: core.y, r: 16 + rnd() * 10, speed: 18 + rnd() * 16, reverse: rnd() > 0.5 },
-  };
+interface EventArtProps {
+  seed: string;
+  accent: string;
+  title?: string;
+  tagline?: string;
+  eventType?: "single" | "multi" | "round";
+  startDate?: number;
+  className?: string;
+  showOrbit?: boolean;
 }
 
 /**
- * Deterministic procedural cover art for an event — every event id renders a
- * unique themed scene: aurora glows, orbit rings, a starfield and a glowing
- * core in the event's accent color.
+ * Generates a rich, poster-style visual for an event.
+ * Renders the event title, type, date, and themed decorations.
  */
 export function EventArt({
   seed,
   accent,
+  title = "",
+  tagline = "",
+  eventType = "single",
+  startDate,
   className,
-  showOrbit = true,
-}: {
-  seed: string;
-  accent: string;
-  className?: string;
-  showOrbit?: boolean;
-}) {
-  const scene = useMemo(() => buildScene(seed), [seed]);
+  showOrbit = false,
+}: EventArtProps) {
+  const scene = useMemo(() => {
+    const rnd = mulberry(hashSeed(seed));
+    return {
+      bgAngle: 120 + rnd() * 60,
+      shapes: Array.from({ length: 6 }, () => ({
+        type: ["circle", "rect", "diamond", "line"][Math.floor(rnd() * 4)] as string,
+        x: rnd() * 100,
+        y: rnd() * 100,
+        size: 8 + rnd() * 40,
+        rotation: rnd() * 360,
+        opacity: 0.04 + rnd() * 0.1,
+      })),
+      gridLines: Math.floor(3 + rnd() * 5),
+      gridAngle: -30 + rnd() * 60,
+      cornerDecor: rnd() > 0.4,
+      topBar: rnd() > 0.3,
+    };
+  }, [seed]);
+
+  const hsl = hexToHSL(accent);
+  const darkBg = `hsl(${hsl.h}, ${Math.min(hsl.s + 10, 40)}%, 8%)`;
+  const midBg = `hsl(${hsl.h}, ${Math.min(hsl.s + 5, 35)}%, 12%)`;
+  const label = eventType ? TYPE_LABEL[eventType] : "";
+  const dateStr = startDate ? fmtDate(startDate) : "";
 
   return (
     <div className={cn("absolute inset-0 overflow-hidden", className)}>
-      {/* base */}
+      {/* base gradient */}
       <div
         className="absolute inset-0"
         style={{
-          background: `linear-gradient(160deg, #191228 0%, #120d1e 55%, #0d0916 100%)`,
+          background: `linear-gradient(${scene.bgAngle}deg, ${darkBg} 0%, ${midBg} 50%, ${darkBg} 100%)`,
         }}
       />
-      {/* accent wash */}
+
+      {/* accent radial glow */}
       <div
         className="absolute inset-0"
         style={{
-          background: `radial-gradient(90% 70% at 70% 12%, ${hexToRgba(accent, 0.14)}, transparent 65%)`,
+          background: `radial-gradient(ellipse at 25% 35%, ${accent}33 0%, transparent 55%), radial-gradient(ellipse at 80% 75%, ${accent}22 0%, transparent 45%)`,
         }}
       />
 
-      {/* svg scene */}
-      <svg
-        viewBox="0 0 100 100"
-        preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 h-full w-full"
-        aria-hidden
-      >
-        <defs>
-          <radialGradient id={`core-${seed}`} cx="50%" cy="42%" r="60%">
-            <stop offset="0%" stopColor={hexToRgba(accent, 0.9)} />
-            <stop offset="55%" stopColor={hexToRgba(accent, 0.45)} />
-            <stop offset="100%" stopColor={hexToRgba(accent, 0)} />
-          </radialGradient>
-        </defs>
-
-        {scene.blobs.map((b, i) => (
-          <circle
-            key={`b${i}`}
-            cx={b.x}
-            cy={b.y}
-            r={b.r}
-            fill={hexToRgba(accent, b.o)}
-            style={{ filter: "blur(6px)" }}
-          />
-        ))}
-
-        {scene.stars.map((s, i) => (
-          <circle key={`s${i}`} cx={s.x} cy={s.y} r={s.r} fill="rgba(255,255,255,0.7)" opacity={s.o} />
-        ))}
-
-        {scene.rings.map((r, i) => (
-          <ellipse
-            key={`r${i}`}
-            cx={r.cx}
-            cy={r.cy}
-            rx={r.rx}
-            ry={r.ry}
-            fill="none"
-            stroke={hexToRgba(accent, r.o)}
-            strokeWidth={r.sw}
-            transform={`rotate(${(i * 47 + 12) % 360} ${r.cx} ${r.cy})`}
-          />
-        ))}
-
-        <circle
-          cx={scene.core.x}
-          cy={scene.core.y}
-          r={scene.core.r * 3.4}
-          fill={`url(#core-${seed})`}
-        />
-        <circle
-          cx={scene.core.x}
-          cy={scene.core.y}
-          r={scene.core.r}
-          fill={hexToRgba(accent, 0.85)}
-        />
-        <circle
-          cx={scene.core.x}
-          cy={scene.core.y}
-          r={scene.core.r * 0.45}
-          fill="rgba(255,255,255,0.85)"
-        />
+      {/* diagonal grid pattern */}
+      <svg className="absolute inset-0 h-full w-full opacity-[0.06]" aria-hidden>
+        {Array.from({ length: scene.gridLines }, (_, i) => {
+          const offset = (i + 1) * (100 / (scene.gridLines + 1));
+          return (
+            <line
+              key={i}
+              x1={`${offset}%`}
+              y1="0"
+              x2={`${offset - 15}%`}
+              y2="100%"
+              stroke={accent}
+              strokeWidth="0.5"
+              transform={`rotate(${scene.gridAngle} 50 50)`}
+            />
+          );
+        })}
       </svg>
 
-      {/* animated orbit */}
+      {/* decorative shapes */}
+      <svg className="absolute inset-0 h-full w-full" aria-hidden>
+        {scene.shapes.map((s, i) => {
+          if (s.type === "circle") {
+            return (
+              <circle
+                key={i}
+                cx={`${s.x}%`}
+                cy={`${s.y}%`}
+                r={s.size / 2}
+                fill="none"
+                stroke={accent}
+                strokeWidth="0.5"
+                opacity={s.opacity}
+              />
+            );
+          }
+          if (s.type === "rect") {
+            return (
+              <rect
+                key={i}
+                x={`${s.x - s.size / 2}%`}
+                y={`${s.y - s.size / 2}%`}
+                width={`${s.size}%`}
+                height={`${s.size * 0.6}%`}
+                fill="none"
+                stroke={accent}
+                strokeWidth="0.5"
+                opacity={s.opacity}
+                transform={`rotate(${s.rotation} ${s.x} ${s.y})`}
+                rx="2"
+              />
+            );
+          }
+          if (s.type === "diamond") {
+            return (
+              <polygon
+                key={i}
+                points={`${s.x},${s.y - s.size / 3} ${s.x + s.size / 4},${s.y} ${s.x},${s.y + s.size / 3} ${s.x - s.size / 4},${s.y}`}
+                fill="none"
+                stroke={accent}
+                strokeWidth="0.5"
+                opacity={s.opacity}
+              />
+            );
+          }
+          // line
+          return (
+            <line
+              key={i}
+              x1={`${s.x}%`}
+              y1={`${s.y}%`}
+              x2={`${s.x + s.size * 0.5}%`}
+              y2={`${s.y + s.size * 0.3}%`}
+              stroke={accent}
+              strokeWidth="0.5"
+              opacity={s.opacity}
+            />
+          );
+        })}
+      </svg>
+
+      {/* corner brackets */}
+      {scene.cornerDecor && (
+        <>
+          <div className="absolute left-3 top-3 h-8 w-8 border-t-2 border-l-2" style={{ borderColor: `${accent}44` }} />
+          <div className="absolute right-3 top-3 h-8 w-8 border-t-2 border-r-2" style={{ borderColor: `${accent}44` }} />
+          <div className="absolute bottom-3 left-3 h-8 w-8 border-b-2 border-l-2" style={{ borderColor: `${accent}44` }} />
+          <div className="absolute bottom-3 right-3 h-8 w-8 border-b-2 border-r-2" style={{ borderColor: `${accent}44` }} />
+        </>
+      )}
+
+      {/* top bar with type + date */}
+      {scene.topBar && (
+        <div className="absolute inset-x-0 top-0 flex items-center justify-between px-4 pt-3">
+          {label && (
+            <span
+              className="rounded-full px-2.5 py-0.5 text-[9px] font-bold uppercase tracking-widest"
+              style={{
+                color: accent,
+                background: `${accent}18`,
+                border: `1px solid ${accent}40`,
+              }}
+            >
+              {label}
+            </span>
+          )}
+          {dateStr && (
+            <span className="text-[9px] font-bold uppercase tracking-widest text-white/45">
+              {dateStr}
+            </span>
+          )}
+        </div>
+      )}
+
+      {/* title text at bottom — large, bold */}
+      {title && (
+        <div className="absolute inset-x-0 bottom-0 flex flex-col justify-end p-4 pt-16">
+          <p
+            className="font-display text-xl font-bold leading-tight text-white drop-shadow-[0_2px_12px_rgba(0,0,0,0.9)] sm:text-2xl"
+            style={{ textShadow: `0 0 30px ${accent}44` }}
+          >
+            {title}
+          </p>
+          {tagline && (
+            <p className="mt-1 max-w-[85%] truncate text-[11px] text-white/60">
+              {tagline}
+            </p>
+          )}
+          <div className="mt-2 h-px w-full" style={{ background: `linear-gradient(to right, ${accent}88, transparent)` }} />
+        </div>
+      )}
+
+      {/* orbit decoration (optional, for landing page art panel) */}
       {showOrbit && (
-        <div
-          className="orb-spin-slow absolute"
-          style={{
-            left: `${scene.orbit.x}%`,
-            top: `${scene.orbit.y}%`,
-            width: scene.orbit.r * 2,
-            height: scene.orbit.r * 2,
-            transform: "translate(-50%, -50%)",
-            animationDuration: `${scene.orbit.speed}s`,
-            animationDirection: scene.orbit.reverse ? "reverse" : "normal",
-          }}
-        >
+        <div className="absolute left-1/2 top-1/2 h-[60%] w-[60%] -translate-x-1/2 -translate-y-1/2">
           <div
-            className="absolute inset-0 rounded-full border border-dashed"
-            style={{ borderColor: hexToRgba(accent, 0.35) }}
+            className="orb-spin-slow absolute inset-0 rounded-full border border-dashed"
+            style={{ borderColor: `${accent}30`, animationDuration: "40s" }}
           />
-          <span
-            className="absolute left-1/2 top-0 h-1 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ background: hexToRgba(accent, 0.9), boxShadow: `0 0 8px 2px ${hexToRgba(accent, 0.5)}` }}
+          <div
+            className="orb-spin-slow absolute inset-[15%] rounded-full border"
+            style={{ borderColor: `${accent}18`, animationDuration: "28s", animationDirection: "reverse" }}
           />
+          <div className="orb-spin-slow absolute inset-0" style={{ animationDuration: "16s" }}>
+            <span
+              className="absolute left-1/2 top-0 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+              style={{ background: accent, boxShadow: `0 0 12px 4px ${accent}88` }}
+            />
+          </div>
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div
+              className="h-16 w-16 rounded-full blur-lg"
+              style={{ background: `radial-gradient(circle, ${accent}55, transparent 70%)` }}
+            />
+          </div>
         </div>
       )}
 
       {/* vignette */}
-      <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_30%,transparent_55%,rgba(5,3,10,0.55)_100%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(120%_120%_at_50%_30%,transparent_50%,rgba(0,0,0,0.6)_100%)]" />
     </div>
   );
 }
