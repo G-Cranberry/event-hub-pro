@@ -67,12 +67,12 @@ export default function Landing() {
           <span className="orb-neon-border flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-ember/20 to-[#0e0a16]/80">
             <Orbit className="h-4.5 w-4.5 text-ember" />
           </span>
-          <span className="font-display text-lg font-bold tracking-[0.24em] text-white">
+          <span className="font-display text-lg font-bold tracking-[0.24em] text-foreground">
             ORBIT
           </span>
         </Link>
 
-        <nav className="hidden items-center gap-7 text-sm font-semibold text-white/60 md:flex">
+        <nav className="hidden items-center gap-7 text-sm font-semibold text-foreground/60 md:flex">
           {[
             { label: "Discover", to: "/auth?returnTo=%2Fevents" },
             { label: "Wallet", to: "/auth?returnTo=%2Fpasses" },
@@ -92,7 +92,7 @@ export default function Landing() {
         <Button
           asChild
           variant="outline"
-          className="orb-neon-border gap-2 rounded-full bg-white/5 text-white backdrop-blur hover:border-ember/70 hover:bg-ember/10 hover:text-ember"
+          className="orb-neon-border gap-2 rounded-full bg-foreground/5 text-foreground backdrop-blur hover:border-ember/70 hover:bg-ember/10 hover:text-ember"
         >
           <Link to="/auth">
             <Sparkles className="h-4 w-4 text-ember" />
@@ -133,7 +133,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-7 max-w-lg text-[15px] leading-7 text-white/65"
+            className="mt-7 max-w-lg text-[15px] leading-7 text-foreground/65"
           >
             Proudly powered by Convex, enter the immersive world of ORBIT — a
             multi-mode event platform. Marrying the best of registration, digital
@@ -161,7 +161,7 @@ export default function Landing() {
               asChild
               size="lg"
               variant="outline"
-              className="orb-neon-border h-12 rounded-full bg-white/5 px-7 text-white backdrop-blur hover:border-ember/60 hover:bg-ember/10 hover:text-ember"
+              className="orb-neon-border h-12 rounded-full bg-foreground/5 px-7 text-foreground backdrop-blur hover:border-ember/60 hover:bg-ember/10 hover:text-ember"
             >
               <Link to="/auth?returnTo=%2Forg%2Fevents">Run an event</Link>
             </Button>
@@ -177,7 +177,7 @@ export default function Landing() {
             {PLATFORMS.map(({ label, icon: Icon }) => (
               <span
                 key={label}
-                className="flex items-center gap-1.5 rounded-md border border-ember/15 bg-black/30 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-white/55"
+                className="flex items-center gap-1.5 rounded-md border border-ember/15 bg-foreground/5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-foreground/55"
               >
                 <Icon className="h-3.5 w-3.5 text-ember/80" />
                 {label}
@@ -212,7 +212,7 @@ export default function Landing() {
                 </p>
               </div>
             </div>
-            <p className="mt-5 text-sm leading-6 text-white/60">
+            <p className="mt-5 text-sm leading-6 text-foreground/60">
               Browse events, fill organizer-designed forms, carry your pass in a
               wallet, track round results, grab seats in carpools, and download
               certificates.
@@ -235,7 +235,7 @@ export default function Landing() {
                 </p>
               </div>
             </div>
-            <p className="mt-5 text-sm leading-6 text-white/60">
+            <p className="mt-5 text-sm leading-6 text-foreground/60">
               Design registration forms field by field, watch registrations land
               live, scan passes at the door, advance teams between rounds, and
               publish certificates and galleries.
@@ -257,13 +257,13 @@ export default function Landing() {
                 <span className="orb-hud-blink mr-2 inline-block h-1.5 w-1.5 rounded-full bg-ember align-middle" />
                 Live on the portal
               </p>
-              <h2 className="mt-2 font-display text-3xl font-bold text-white">
+              <h2 className="mt-2 font-display text-3xl font-bold text-foreground">
                 Upcoming <span className="text-gradient-ember">events</span>
               </h2>
             </div>
             <Link
               to="/auth?returnTo=%2Fevents"
-              className="hidden items-center gap-1 text-sm font-semibold text-white/60 transition-colors hover:text-ember sm:flex"
+              className="hidden items-center gap-1 text-sm font-semibold text-foreground/60 transition-colors hover:text-ember sm:flex"
             >
               View all <ArrowRight className="h-4 w-4" />
             </Link>
@@ -290,13 +290,13 @@ export default function Landing() {
                   />
                 </div>
                 <div className="p-6">
-                  <h3 className="font-display text-xl font-bold leading-tight text-white">
+                  <h3 className="font-display text-xl font-bold leading-tight text-foreground">
                     {event.title}
                   </h3>
-                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-white/55">
+                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-foreground/55">
                     {event.tagline}
                   </p>
-                  <p className="mt-5 flex items-center gap-1.5 text-[11px] text-white/45">
+                  <p className="mt-5 flex items-center gap-1.5 text-[11px] text-foreground/45">
                     <CalendarDays className="h-3.5 w-3.5 text-ember" />
                     {fmtRange(event.startDate, event.endDate)} · {event.city}
                   </p>
@@ -311,11 +311,11 @@ export default function Landing() {
       <footer className="relative z-10 border-t border-ember/15 px-5 py-8 text-center">
         <div className="flex items-center justify-center gap-2">
           <Orbit className="h-4 w-4 text-ember" />
-          <span className="font-display text-xs font-bold tracking-[0.3em] text-white/60">
+          <span className="font-display text-xs font-bold tracking-[0.3em] text-foreground/60">
             ORBIT
           </span>
         </div>
-        <p className="mt-2 text-[11px] text-white/35">
+        <p className="mt-2 text-[11px] text-foreground/35">
           Event management portal · every event, in one orbit
         </p>
       </footer>
