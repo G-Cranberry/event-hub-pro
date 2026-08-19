@@ -187,10 +187,10 @@
   gap: 6px;
   padding: 8px 18px;
   border-radius: 9999px;
-  border: 1px solid var(--border);
-  background: var(--card);
+  border: 1px solid oklch(0.78 0.18 45 / 0.35);
+  background: oklch(0.18 0.035 305 / 0.7);
   backdrop-filter: blur(12px);
-  color: var(--foreground);
+  color: oklch(0.965 0.01 85);
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
@@ -199,9 +199,20 @@
   transition: all 0.25s;
 }
 .card-nav__btn:hover {
-  border-color: var(--primary);
-  color: var(--primary);
-  background: oklch(from var(--primary) l c h / 0.08);
+  border-color: oklch(0.78 0.18 45);
+  color: oklch(0.78 0.18 45);
+  background: oklch(0.78 0.18 45 / 0.12);
+  box-shadow: 0 0 16px oklch(0.78 0.18 45 / 0.2);
+}
+.light .card-nav__btn {
+  background: rgba(255,255,255,0.85);
+  border-color: rgba(232,102,60,0.3);
+  color: #1a1520;
+}
+.light .card-nav__btn:hover {
+  background: rgba(232,102,60,0.08);
+  border-color: #e8663c;
+  color: #e8663c;
 }
 .card-nav__dots {
   display: flex;
@@ -211,16 +222,21 @@
   width: 24px;
   height: 3px;
   border-radius: 999px;
-  background: var(--muted-foreground);
-  opacity: 0.3;
+  background: oklch(0.965 0.01 85 / 0.2);
   transition: all 0.35s;
   cursor: pointer;
   border: none;
   padding: 0;
 }
 .card-nav__dot--active {
-  background: var(--primary);
-  opacity: 1;
-  box-shadow: 0 0 10px oklch(from var(--primary) l c h / 0.4);
+  background: oklch(0.78 0.18 45);
+  box-shadow: 0 0 10px oklch(0.78 0.18 45 / 0.4);
   width: 32px;
+}
+.light .card-nav__dot {
+  background: rgba(26,21,32,0.2);
+}
+.light .card-nav__dot--active {
+  background: #e8663c;
+  box-shadow: 0 0 10px rgba(232,102,60,0.3);
 }
