@@ -120,7 +120,7 @@ export default function Landing() {
             initial={{ opacity: 0, y: 24 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 font-display text-5xl font-bold leading-[1.04] tracking-tight text-white sm:text-6xl lg:text-7xl"
+            className="mt-6 font-display text-5xl font-bold leading-[1.04] tracking-tight text-foreground sm:text-6xl lg:text-7xl"
           >
             <span className="orb-glitch" data-text="EVERY EVENT">
               EVERY EVENT
@@ -207,7 +207,7 @@ export default function Landing() {
           <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-ember">
             Two worlds, one account
           </p>
-          <h2 className="mt-3 font-display text-3xl font-bold text-white sm:text-4xl">
+          <h2 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">
             Choose your <span className="text-gradient-ember">role</span>
           </h2>
         </div>
@@ -218,8 +218,8 @@ export default function Landing() {
                 <Users className="h-5 w-5" />
               </span>
               <div>
-                <p className="font-display text-xl font-bold text-white">Participant</p>
-                <p className="text-xs uppercase tracking-widest text-white/40">
+                <p className="font-display text-xl font-bold text-foreground">Participant</p>
+                <p className="text-xs uppercase tracking-widest text-foreground/40">
                   Discover · Register · Attend
                 </p>
               </div>
@@ -241,8 +241,8 @@ export default function Landing() {
                 <UserCog className="h-5 w-5" />
               </span>
               <div>
-                <p className="font-display text-xl font-bold text-white">Organizer</p>
-                <p className="text-xs uppercase tracking-widest text-white/40">
+                <p className="font-display text-xl font-bold text-foreground">Organizer</p>
+                <p className="text-xs uppercase tracking-widest text-foreground/40">
                   Create · Scan · Manage
                 </p>
               </div>

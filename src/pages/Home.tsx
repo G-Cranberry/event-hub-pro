@@ -69,10 +69,10 @@ export default function Home() {
           <span className="orb-hud-blink h-1.5 w-1.5 rounded-full bg-ember" />
           Mission control
         </p>
-        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Welcome back{firstName ? `, ${firstName}` : ""}
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-white/55">
+        <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/55">
           {mode === "organizer"
             ? "You're in Organizer mode — run your events from here."
             : "Your event orbit, at a glance. Pick up where you left off."}
@@ -106,8 +106,8 @@ export default function Home() {
           >
             <Icon className={`h-5 w-5 ${color}`} />
             <div className="mt-6">
-              <p className="font-display text-3xl font-bold text-white">{value}</p>
-              <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-white/45">
+              <p className="font-display text-3xl font-bold text-foreground">{value}</p>
+              <p className="mt-0.5 text-[11px] font-semibold uppercase tracking-wider text-foreground/45">
                 {label}
               </p>
             </div>
@@ -123,7 +123,7 @@ export default function Home() {
         className="mt-12"
       >
         <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-display text-lg font-bold text-white">
+          <h2 className="font-display text-lg font-bold text-foreground">
             {mode === "organizer" ? "Organizer toolkit" : "Quick launch"}
           </h2>
         </div>
@@ -190,8 +190,8 @@ export default function Home() {
               >
                 <Icon className="h-5 w-5" />
               </span>
-              <p className="mt-3 text-sm font-bold text-white">{label}</p>
-              <p className="mt-0.5 text-[11px] text-white/45">{desc}</p>
+              <p className="mt-3 text-sm font-bold text-foreground">{label}</p>
+              <p className="mt-0.5 text-[11px] text-foreground/45">{desc}</p>
             </Link>
           ))}
         </div>
@@ -206,7 +206,7 @@ export default function Home() {
           className="relative z-10 mt-12"
         >
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-white">Latest pass</h2>
+            <h2 className="font-display text-lg font-bold text-foreground">Latest pass</h2>
             <Link
               to="/passes"
               className="flex items-center gap-1 text-xs font-semibold text-ember hover:underline"
@@ -229,7 +229,7 @@ export default function Home() {
           className="relative z-10 mt-12"
         >
           <div className="mb-4 flex items-center justify-between">
-            <h2 className="font-display text-lg font-bold text-white">Up next</h2>
+            <h2 className="font-display text-lg font-bold text-foreground">Up next</h2>
             <Link
               to="/events"
               className="flex items-center gap-1 text-xs font-semibold text-ember hover:underline"
@@ -264,8 +264,8 @@ export default function Home() {
             <CalendarDays className="h-6 w-6 text-ember" />
           </span>
           <div>
-            <p className="font-display text-lg font-bold text-white">Your orbit is empty</p>
-            <p className="mt-1 text-sm text-white/55">
+            <p className="font-display text-lg font-bold text-foreground">Your orbit is empty</p>
+            <p className="mt-1 text-sm text-foreground/55">
               {fmtDate(Date.now())} — discover an event and grab your first pass.
             </p>
           </div>

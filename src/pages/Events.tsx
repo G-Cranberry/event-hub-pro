@@ -47,10 +47,10 @@ export default function Events() {
         <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-ember">
           Discover
         </p>
-        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
+        <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-foreground sm:text-5xl">
           Events
         </h1>
-        <p className="mt-2 max-w-xl text-sm leading-6 text-white/55">
+        <p className="mt-2 max-w-xl text-sm leading-6 text-foreground/55">
           Every event on the portal. Pick one, register with the organizer's own
           form, and get your digital pass.
         </p>
@@ -58,7 +58,7 @@ export default function Events() {
 
       {/* toolbar */}
       <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex rounded-full border border-white/10 bg-black/30 p-1 backdrop-blur">
+        <div className="flex rounded-full border border-foreground/10 bg-foreground/5 p-1 backdrop-blur">
           {(["upcoming", "past"] as Tab[]).map((t) => (
             <button
               key={t}
@@ -67,7 +67,7 @@ export default function Events() {
               className={`rounded-full px-5 py-2 text-sm font-semibold capitalize transition-colors ${
                 tab === t
                   ? "bg-ember text-[#160a04]"
-                  : "text-white/60 hover:text-white"
+                  : "text-foreground/60 hover:text-foreground"
               }`}
             >
               {t}
@@ -84,12 +84,12 @@ export default function Events() {
           ))}
         </div>
         <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/35" />
+          <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground/35" />
           <input
             value={q}
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search title, city, organizer…"
-            className="h-11 w-full rounded-full border border-white/10 bg-black/30 pl-10 pr-4 text-sm text-white placeholder:text-white/35 outline-none transition-colors focus:border-ember/60 sm:w-72"
+            className="h-11 w-full rounded-full border border-foreground/10 bg-foreground/5 pl-10 pr-4 text-sm text-foreground placeholder:text-foreground/35 outline-none transition-colors focus:border-ember/60 sm:w-72"
           />
         </div>
       </div>
@@ -101,11 +101,11 @@ export default function Events() {
           animate={{ opacity: 1 }}
           className="orb-card mt-10 flex flex-col items-center gap-3 p-12 text-center"
         >
-          <CalendarDays className="h-8 w-8 text-white/30" />
-          <p className="font-display text-lg font-bold text-white">
+          <CalendarDays className="h-8 w-8 text-foreground/30" />
+          <p className="font-display text-lg font-bold text-foreground">
             No {tab} events match
           </p>
-          <p className="max-w-sm text-sm text-white/50">
+          <p className="max-w-sm text-sm text-foreground/50">
             {tab === "upcoming"
               ? "New events land here as organizers publish them. Check back soon."
               : "Past events will appear in this archive once they wrap up."}
