@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
 import type { Doc } from "@/convex/_generated/dataModel";
 import { TYPE_LABEL, fmtRange } from "@/lib/orbit";
@@ -7,65 +7,54 @@ import "./card-carousel.css";
 
 type Event = Doc<"events">;
 
-/**
- * 3D card carousel with swipe/scroll gestures.
- * Supports: drag/swipe, scroll wheel, and Previous/Next buttons.
- */
+/** 3D card carousel with swipe/scroll gestures. */
 export function CardCarousel({ events }: { events: Event[] }) {
   const [active, setActive] = useState(0);
   const [flipped, setFlipped] = useState<Record<string, boolean>>({});
+
   const dragStartX = useRef(0);
   const dragDelta = useRef(0);
   const isDragging = useRef(false);
-
   const total = events.length;
-
-  // Use a ref to avoid stale closures in event handlers
   const totalRef = useRef(total);
   totalRef.current = total;
-  const activeRef = useRef(active);
-  activeRef.current = active;
-  const flippedRef = useRef(flipped);
-  flippedRef.current = flipped;
 
-  const prev = useCallback(() => {
+  function prev() {
     setActive((a) => (a - 1 + totalRef.current) % totalRef.current);
     setFlipped({});
-  }, []);
+  }
 
-  const next = useCallback(() => {
+  function next() {
     setActive((a) => (a + 1) % totalRef.current);
     setFlipped({});
-  }, []);
+  }
 
-  const toggleFlip = useCallback((id: string) => {
+  function toggleFlip(id: string) {
     if (isDragging.current) return;
     setFlipped((f) => ({ ...f, [id]: !f[id] }));
-  }, []);
+  }
 
-  // Drag/swipe handlers
-  const onPointerDown = useCallback((e: React.PointerEvent) => {
+  function handlePointerDown(e: React.PointerEvent) {
     dragStartX.current = e.clientX;
     dragDelta.current = 0;
     isDragging.current = false;
     (e.target as HTMLElement).setPointerCapture(e.pointerId);
-  }, []);
+  }
 
-  const onPointerMove = useCallback((e: React.PointerEvent) => {
+  function handlePointerMove(e: React.PointerEvent) {
     const dx = e.clientX - dragStartX.current;
     dragDelta.current = dx;
     if (Math.abs(dx) > 5) isDragging.current = true;
-  }, []);
+  }
 
-  const onPointerUp = useCallback(() => {
+  function handlePointerUp() {
     const threshold = 50;
     if (dragDelta.current > threshold) prev();
     else if (dragDelta.current < -threshold) next();
     setTimeout(() => { isDragging.current = false; }, 10);
-  }, [prev, next]);
+  }
 
-  // Scroll wheel handler — stable via refs, no dependency issues
-  const onWheel = useCallback((e: React.WheelEvent) => {
+  function handleWheel(e: React.WheelEvent) {
     if (Math.abs(e.deltaX) > Math.abs(e.deltaY)) {
       if (e.deltaX > 30) next();
       else if (e.deltaX < -30) prev();
@@ -73,12 +62,10 @@ export function CardCarousel({ events }: { events: Event[] }) {
       if (e.deltaY > 30) next();
       else if (e.deltaY < -30) prev();
     }
-  }, [prev, next]);
+  }
 
-  // Early return AFTER all hooks — never before
   if (total === 0) return null;
 
-  // Build visible slots
   const getSlotIndex = (slot: "left" | "center" | "right") => {
     if (slot === "center") return active;
     if (slot === "left") return (active - 1 + total) % total;
@@ -93,10 +80,10 @@ export function CardCarousel({ events }: { events: Event[] }) {
   return (
     <div
       className="flex flex-col items-center touch-pan-y"
-      onPointerDown={onPointerDown}
-      onPointerMove={onPointerMove}
-      onPointerUp={onPointerUp}
-      onWheel={onWheel}
+      onPointerDown={handlePointerDown}
+      onPointerMove={handlePointerMove}
+      onPointerUp={handlePointerUp}
+      onWheel={handleWheel}
       style={{ touchAction: "pan-y" }}
     >
       <div className="card-carousel cursor-grab active:cursor-grabbing">
@@ -113,7 +100,6 @@ export function CardCarousel({ events }: { events: Event[] }) {
                   ["--card-bg" as string]: `linear-gradient(160deg, #1a1028 0%, #120a1e 100%)`,
                 }}
               >
-                {/* Front face */}
                 <div className="card-3d__face card-3d__front">
                   <EventArt
                     seed={event._id}
@@ -125,7 +111,6 @@ export function CardCarousel({ events }: { events: Event[] }) {
                     className="absolute inset-0"
                   />
                 </div>
-                {/* Back face */}
                 <div className="card-3d__face card-3d__back" style={{ background: `linear-gradient(160deg, #1a1028, ${event.accent}12)` }}>
                   <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full" style={{ border: `1.5px solid ${event.accent}55`, background: `${event.accent}15` }}>
                     <Sparkles className="h-4 w-4" style={{ color: event.accent }} />
@@ -144,7 +129,6 @@ export function CardCarousel({ events }: { events: Event[] }) {
         })}
       </div>
 
-      {/* Nav buttons + dots */}
       <div className="card-nav">
         <button type="button" className="card-nav__btn" onClick={prev}>
           <ChevronLeft className="h-3.5 w-3.5" /> Previous
