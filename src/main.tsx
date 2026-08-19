@@ -34,6 +34,7 @@ const OrgGallery = lazy(() => import("./pages/OrgGallery.tsx"));
 const OrgBudget = lazy(() => import("./pages/OrgBudget.tsx"));
 const OrgCommunication = lazy(() => import("./pages/OrgCommunication.tsx"));
 const OrgFeedback = lazy(() => import("./pages/OrgFeedback.tsx"));
+const OrgRegistrations = lazy(() => import("./pages/OrgRegistrations.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
@@ -318,6 +319,16 @@ createRoot(document.getElementById("root")!).render(
                   <RequireAuth>
                     <AppShell>
                       <OrgFeedback />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/org/events/:id/registrations"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <OrgRegistrations />
                     </AppShell>
                   </RequireAuth>
                 }

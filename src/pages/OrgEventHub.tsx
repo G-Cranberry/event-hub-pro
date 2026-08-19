@@ -7,6 +7,7 @@ import {
   Blocks,
   Camera,
   DollarSign,
+  Table2,
   LayoutGrid,
   Megaphone,
   MessageSquare,
@@ -102,6 +103,13 @@ export default function OrgEventHub() {
       desc: "Publish event photos",
       icon: Camera,
       to: `/org/events/${event._id}/gallery`,
+      accent: "border-accent/40 bg-accent/10 text-accent",
+    },
+    {
+      label: "Registrations",
+      desc: "Live spreadsheet of all registrations",
+      icon: Table2,
+      to: `/org/events/${event._id}/registrations`,
       accent: "border-accent/40 bg-accent/10 text-accent",
     },
     {
