@@ -31,6 +31,7 @@ const OrgScanner = lazy(() => import("./pages/OrgScanner.tsx"));
 const OrgFormBuilder = lazy(() => import("./pages/OrgFormBuilder.tsx"));
 const OrgCertificate = lazy(() => import("./pages/OrgCertificate.tsx"));
 const OrgGallery = lazy(() => import("./pages/OrgGallery.tsx"));
+const Profile = lazy(() => import("./pages/Profile.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
 // Simple loading fallback for route transitions
@@ -299,8 +300,20 @@ createRoot(document.getElementById("root")!).render(
                 }
               />
 
-              {/* Legacy dashboard redirects into the role-aware home */}
-              <Route path="/dashboard" element={<Navigate to="/home" replace />} />
+              {/* Legacy dashboard redirects into the role-aware home */}              <Route
+                path="/profile"
+                element={
+                  <RequireAuth>
+                    <AppShell>
+                      <Profile />
+                    </AppShell>
+                  </RequireAuth>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={<Navigate to="/home" replace />}
+              />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </Suspense>
