@@ -8,6 +8,7 @@ import {
 
 import { useAuth } from "@/hooks/use-auth";
 import { ArrowRight, Loader2, Mail, Orbit, UserRound } from "lucide-react";
+import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
 import { Suspense, useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
 
@@ -102,31 +103,38 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
   };
 
   const inputClass =
-    "h-11 rounded-xl border-white/12 bg-black/25 text-white placeholder:text-white/35 transition-[border-color,box-shadow] focus-visible:border-ember/60 focus-visible:ring-2 focus-visible:ring-ember/20";
+    "h-11 rounded-xl border-ember/20 bg-black/30 text-white placeholder:text-white/35 transition-[border-color,box-shadow] focus-visible:border-ember/60 focus-visible:ring-2 focus-visible:ring-ember/25 focus-visible:shadow-[0_0_16px_-4px_rgba(255,92,56,0.3)]";
 
   return (
     <div className="relative flex min-h-screen flex-col overflow-hidden">
-      {/* ambient candlelight glows */}
-      <div className="pointer-events-none absolute inset-0" aria-hidden>
-        <div className="absolute -top-28 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,oklch(0.8_0.13_78/0.14),transparent_70%)] blur-2xl" />
-        <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,oklch(0.68_0.16_300/0.16),transparent_70%)] blur-2xl" />
-        <div className="absolute -right-24 top-1/3 h-72 w-72 rounded-full bg-[radial-gradient(circle,oklch(0.74_0.16_50/0.12),transparent_70%)] blur-2xl" />
+      {/* particle background */}
+      <div className="pointer-events-none absolute inset-0">
+        <ParticleCanvas count={40} color="ember" />
       </div>
+      {/* ambient neon glows */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <div className="absolute -top-28 left-1/2 h-80 w-80 -translate-x-1/2 rounded-full bg-[radial-gradient(circle,oklch(0.74_0.16_50/0.18),transparent_70%)] blur-2xl" />
+        <div className="absolute -bottom-24 -left-20 h-72 w-72 rounded-full bg-[radial-gradient(circle,oklch(0.68_0.16_300/0.16),transparent_70%)] blur-2xl" />
+        <div className="absolute -right-24 top-1/3 h-72 w-72 rounded-full bg-[radial-gradient(circle,oklch(0.74_0.16_50/0.14),transparent_70%)] blur-2xl" />
+      </div>
+      {/* scan line overlay */}
+      <div className="orb-scanlines pointer-events-none absolute inset-0 opacity-20" />
 
       {/* Auth content */}
       <div className="relative flex flex-1 items-center justify-center px-4 py-10">
         <div className="w-full max-w-md">
-          <div className="orb-card orb-candle p-8 sm:p-10">
+          <div className="orb-card orb-neon-border orb-hud-corners p-8 sm:p-10">
             {/* brand */}
             <div className="mb-8 flex flex-col items-center text-center">
               <button
                 onClick={() => navigate("/")}
-                className="group flex h-16 w-16 items-center justify-center rounded-full border border-gold/45 bg-gradient-to-br from-[#2a1a3e] to-[#1a1026] shadow-[0_0_32px_-6px_rgba(255,170,70,0.5)] transition-transform hover:scale-105"
+                className="orb-neon-border group flex h-16 w-16 items-center justify-center rounded-full bg-gradient-to-br from-ember/15 to-[#0e0a16]/80 transition-transform hover:scale-105"
                 aria-label="Back to home"
               >
                 <Orbit className="h-7 w-7 text-ember transition-transform group-hover:rotate-45" />
               </button>
-              <p className="mt-5 text-[10px] font-bold uppercase tracking-[0.3em] text-gold/80">
+              <p className="mt-5 flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.3em] text-ember/80">
+                <span className="orb-hud-blink h-1 w-1 rounded-full bg-ember" />
                 Orbit · Event Portal
               </p>
               <h1 className="mt-2 font-display text-3xl font-bold text-white">
@@ -159,6 +167,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                       disabled={isLoading}
                       required
                     />
+                    <div className="pointer-events-none absolute inset-x-0 bottom-0 h-px bg-gradient-to-r from-transparent via-ember/40 to-transparent" />
                   </div>
                 </div>
 
@@ -191,7 +200,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     <span className="w-full border-t border-white/10" />
                   </div>
                   <div className="relative flex justify-center text-[10px] font-bold uppercase tracking-[0.25em] text-white/30">
-                    <span className="bg-transparent px-3">Or</span>
+                    <span className="bg-[#0e0a16] px-3">Or</span>
                   </div>
                 </div>
 
@@ -266,7 +275,7 @@ function Auth({ redirectAfterAuth }: AuthProps = {}) {
                     type="button"
                     onClick={() => setStep("signIn")}
                     disabled={isLoading}
-                    className="font-semibold text-gold/80 hover:text-gold"
+                    className="font-semibold text-ember/80 hover:text-ember"
                   >
                     Use a different email
                   </button>

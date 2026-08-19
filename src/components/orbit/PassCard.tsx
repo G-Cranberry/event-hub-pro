@@ -43,7 +43,7 @@ export function PassCard({
 
   return (
     <div
-      className="orb-card overflow-hidden p-0"
+      className="orb-card orb-neon-border orb-hud-corners overflow-hidden p-0"
       style={{ ["--cover-accent" as string]: event.accent }}
     >
       <div className="relative border-b border-white/10 p-5">

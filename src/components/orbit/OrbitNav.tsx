@@ -166,7 +166,7 @@ export function OrbitNav() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.35, opacity: 0 }}
               transition={{ type: "spring", stiffness: 260, damping: 22 }}
-              className="glass fixed bottom-4 right-4 z-50 flex items-center justify-center rounded-full sm:bottom-6 sm:right-6"
+              className="glass fixed bottom-4 right-4 z-50 flex items-center justify-center rounded-full sm:bottom-6 sm:right-6 orb-neon-border orb-scanlines"
               style={{
                 width: radius * 2 + 148,
                 height: radius * 2 + 148,
@@ -218,11 +218,11 @@ export function OrbitNav() {
                           ? "border-ember bg-ember/20 text-ember"
                           : "border-white/15 bg-black/40 text-white/85 hover:border-ember/60 hover:bg-ember/10",
                       )}
-                      style={{ boxShadow: isActive ? "0 0 24px rgba(255,92,56,0.35)" : undefined }}
+                      style={{ boxShadow: isActive ? "0 0 24px rgba(255,92,56,0.45), 0 0 40px -8px rgba(255,92,56,0.25)" : undefined }}
                     >
                       <Icon className="h-6 w-6" />
                     </span>
-                    <span className="whitespace-nowrap rounded-full bg-black/60 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/75 backdrop-blur">
+                    <span className="whitespace-nowrap rounded-full border border-ember/20 bg-black/70 px-2.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-white/75 backdrop-blur">
                       {item.label}
                     </span>
                   </button>
@@ -251,11 +251,11 @@ export function OrbitNav() {
         type="button"
         aria-label={open ? "Close menu" : "Open menu"}
         onClick={() => setOpen((o) => !o)}
-        className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full border border-ember/50 bg-gradient-to-br from-ember/30 to-ember/10 text-white backdrop-blur transition-transform hover:scale-105 active:scale-95"
-        style={{ boxShadow: open ? undefined : "0 8px 30px -6px rgba(255,92,56,0.5)" }}
+        className="relative z-50 flex h-14 w-14 items-center justify-center rounded-full border border-ember/50 bg-gradient-to-br from-ember/30 to-ember/10 text-white backdrop-blur transition-transform hover:scale-105 active:scale-95 orb-border-glow"
+        style={{ boxShadow: open ? undefined : "0 8px 30px -6px rgba(255,92,56,0.5), 0 0 20px -4px rgba(255,92,56,0.3)" }}
       >
         {!open && <span className="absolute inset-0 rounded-full orb-ring" />}
-        <span className="absolute inset-1 rounded-full border border-white/10" />
+        <span            className="absolute inset-1 rounded-full border border-ember/20" />
         {open ? (
           <X className="h-5 w-5" />
         ) : (

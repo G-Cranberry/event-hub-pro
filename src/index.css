@@ -159,6 +159,142 @@
   letter-spacing: -0.02em;
 }
 
+/* ---- Gaming / cyberpunk utilities ---- */
+
+@keyframes scan-line {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+.orb-scanlines {
+  position: relative;
+  overflow: hidden;
+}
+.orb-scanlines::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 2px,
+    rgba(0,0,0,0.04) 2px,
+    rgba(0,0,0,0.04) 4px
+  );
+  z-index: 2;
+}
+
+@keyframes glitch-shift {
+  0%, 100% { transform: translate(0); }
+  20% { transform: translate(-2px, 1px); }
+  40% { transform: translate(2px, -1px); }
+  60% { transform: translate(-1px, -1px); }
+  80% { transform: translate(1px, 2px); }
+}
+.orb-glitch {
+  position: relative;
+}
+.orb-glitch::before,
+.orb-glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+.orb-glitch::before {
+  color: oklch(0.74 0.16 50 / 0.7);
+  animation: glitch-shift 3s infinite steps(2);
+  clip-path: inset(10% 0 60% 0);
+}
+.orb-glitch::after {
+  color: oklch(0.82 0.13 78 / 0.6);
+  animation: glitch-shift 3s 0.15s infinite steps(2) reverse;
+  clip-path: inset(55% 0 5% 0);
+}
+
+@keyframes neon-pulse {
+  0%, 100% { opacity: 0.7; filter: blur(0px); }
+  50% { opacity: 1; filter: blur(1px); }
+}
+.orb-neon-pulse {
+  animation: neon-pulse 2.5s ease-in-out infinite;
+}
+
+@keyframes hud-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+.orb-hud-blink {
+  animation: hud-blink 1.8s steps(1) infinite;
+}
+
+@keyframes data-stream {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 0% 100%; }
+}
+.orb-data-stream {
+  background-image: repeating-linear-gradient(
+    180deg,
+    oklch(0.74 0.16 50 / 0.06) 0px,
+    transparent 1px,
+    transparent 8px
+  );
+  background-size: 100% 200%;
+  animation: data-stream 8s linear infinite;
+}
+
+@keyframes border-glow-cycle {
+  0%, 100% { border-color: oklch(0.74 0.16 50 / 0.4); box-shadow: 0 0 12px -4px oklch(0.74 0.16 50 / 0.25); }
+  50% { border-color: oklch(0.82 0.13 78 / 0.5); box-shadow: 0 0 18px -4px oklch(0.82 0.13 78 / 0.3); }
+}
+.orb-border-glow {
+  animation: border-glow-cycle 4s ease-in-out infinite;
+}
+
+.orb-neon-border {
+  border: 1px solid oklch(0.74 0.16 50 / 0.35);
+  box-shadow:
+    inset 0 0 12px oklch(0.74 0.16 50 / 0.06),
+    0 0 20px -6px oklch(0.74 0.16 50 / 0.2);
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+.orb-neon-border:hover {
+  border-color: oklch(0.74 0.16 50 / 0.6);
+  box-shadow:
+    inset 0 0 20px oklch(0.74 0.16 50 / 0.1),
+    0 0 30px -4px oklch(0.74 0.16 50 / 0.35);
+}
+
+/* HUD corner brackets */
+.orb-hud-corners {
+  position: relative;
+}
+.orb-hud-corners::before,
+.orb-hud-corners::after {
+  content: "";
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  pointer-events: none;
+}
+.orb-hud-corners::before {
+  top: 6px;
+  left: 6px;
+  border-top: 2px solid oklch(0.74 0.16 50 / 0.65);
+  border-left: 2px solid oklch(0.74 0.16 50 / 0.65);
+}
+.orb-hud-corners::after {
+  bottom: 6px;
+  right: 6px;
+  border-bottom: 2px solid oklch(0.74 0.16 50 / 0.65);
+  border-right: 2px solid oklch(0.74 0.16 50 / 0.65);
+}
+
+@keyframes float-up {
+  0% { transform: translateY(0); opacity: 0.7; }
+  100% { transform: translateY(-120vh); opacity: 0; }
+}
+
 .text-gradient-ember {
   background: linear-gradient(100deg, #ffe3b3 0%, #ffb347 40%, #ff7a3c 100%);
   -webkit-background-clip: text;

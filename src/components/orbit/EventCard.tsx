@@ -22,7 +22,7 @@ export function EventCard({
   return (
     <Link
       to={`/events/${event._id}`}
-      className="orb-card group block overflow-hidden"
+      className="orb-card orb-neon-border orb-scanlines group block overflow-hidden"
       onClick={() => sessionStorage.setItem("orbit:lastEvent", event._id)}
     >
       {/* cover */}
@@ -30,7 +30,7 @@ export function EventCard({
         <EventArt seed={event._id} accent={event.accent} />
         <div className="absolute inset-0 flex items-end justify-between p-4">
           <div>
-            <p className="font-display text-2xl font-bold leading-none text-white drop-shadow">
+            <p className="font-display text-2xl font-bold leading-none text-white drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">
               {event.title}
             </p>
             <p className="mt-1.5 max-w-[80%] truncate text-xs text-white/70">

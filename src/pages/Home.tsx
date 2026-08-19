@@ -17,6 +17,7 @@ import { useProfile } from "@/components/orbit/ProfileProvider";
 import { ModeSwitcher } from "@/components/orbit/ModeSwitcher";
 import { EventCard } from "@/components/orbit/EventCard";
 import { PassCard } from "@/components/orbit/PassCard";
+import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
 import { fmtDate } from "@/lib/orbit";
 
 export default function Home() {
@@ -49,14 +50,23 @@ export default function Home() {
   ];
 
   return (
-    <div className="mx-auto min-h-screen max-w-6xl px-5 pb-24 pt-24 sm:pt-28">
+    <div className="relative mx-auto min-h-screen max-w-6xl px-5 pb-24 pt-24 sm:pt-28">
+      {/* particle bg */}
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <ParticleCanvas count={35} color="ember" />
+      </div>
+      {/* scan line overlay */}
+      <div className="orb-scanlines pointer-events-none absolute inset-0 z-[1] opacity-20" />
+
       {/* header */}
       <motion.div
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
+        className="relative z-10"
       >
-        <p className="text-[11px] font-semibold uppercase tracking-[0.25em] text-ember">
+        <p className="flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.25em] text-ember">
+          <span className="orb-hud-blink h-1.5 w-1.5 rounded-full bg-ember" />
           Mission control
         </p>
         <h1 className="mt-2 font-display text-4xl font-bold tracking-tight text-white sm:text-5xl">
@@ -86,13 +96,13 @@ export default function Home() {
         initial={{ opacity: 0, y: 16 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.12 }}
-        className="mt-8 grid grid-cols-3 gap-3 sm:gap-4"
+        className="relative z-10 mt-8 grid grid-cols-3 gap-3 sm:gap-4"
       >
         {stats.map(({ label, value, icon: Icon, color, to }) => (
           <Link
             key={label}
             to={to}
-            className="orb-card group flex flex-col justify-between p-4 sm:p-5"
+            className="orb-card orb-neon-border orb-hud-corners group flex flex-col justify-between p-4 sm:p-5"
           >
             <Icon className={`h-5 w-5 ${color}`} />
             <div className="mt-6">
@@ -131,14 +141,14 @@ export default function Home() {
               desc: "Wallet & QR",
               icon: Ticket,
               to: "/passes",
-              accent: "border-accent/40 text-accent",
+              accent: "border-ember/30 text-ember",
             },
             {
               label: "Certificates",
               desc: "Download PDFs",
               icon: Award,
               to: "/certificates",
-              accent: "border-amber-400/40 text-amber-300",
+              accent: "border-gold/40 text-gold",
             },
             ...(mode === "organizer"
               ? [
@@ -163,18 +173,18 @@ export default function Home() {
                     desc: "Relive the day",
                     icon: Camera,
                     to: "/events",
-                    accent: "border-accent/40 text-accent",
+                    accent: "border-ember/30 text-ember",
                   },
                   {
                     label: "Transport",
                     desc: "Buses & carpools",
                     icon: Bus,
                     to: "/events",
-                    accent: "border-amber-400/40 text-amber-300",
+                    accent: "border-gold/40 text-gold",
                   },
                 ]),
           ].map(({ label, desc, icon: Icon, to, accent }) => (
-            <Link key={label} to={to} className="orb-card group p-4">
+            <Link key={label} to={to} className="orb-card orb-neon-border group p-4">
               <span
                 className={`flex h-10 w-10 items-center justify-center rounded-xl border bg-black/30 ${accent}`}
               >
@@ -193,7 +203,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.24 }}
-          className="mt-12"
+          className="relative z-10 mt-12"
         >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-white">Latest pass</h2>
@@ -216,7 +226,7 @@ export default function Home() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
-          className="mt-12"
+          className="relative z-10 mt-12"
         >
           <div className="mb-4 flex items-center justify-between">
             <h2 className="font-display text-lg font-bold text-white">Up next</h2>
@@ -248,7 +258,7 @@ export default function Home() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.3 }}
-          className="orb-card mt-12 flex flex-col items-center gap-4 p-10 text-center"
+          className="orb-card orb-neon-border orb-hud-corners relative z-10 mt-12 flex flex-col items-center gap-4 p-10 text-center"
         >
           <span className="flex h-14 w-14 items-center justify-center rounded-full border border-ember/40 bg-ember/10">
             <CalendarDays className="h-6 w-6 text-ember" />
