@@ -1,4 +1,4 @@
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 
 const LETTERS = "ORBIT".split("");
@@ -7,8 +7,7 @@ const LETTERS = "ORBIT".split("");
 function DoubleDoors({ open }: { open: boolean }) {
   return (
     <div className="absolute right-6 bottom-0 sm:right-12" style={{ perspective: "600px" }}>
-      {/* Door frame */}
-      <div className="relative" style={{ width: 80, height: 140, perspective: "600px" }}>
+      <div className="relative" style={{ width: 80, height: 140 }}>
         {/* Frame border */}
         <div
           className="absolute inset-0 rounded-t-lg"
@@ -19,105 +18,48 @@ function DoubleDoors({ open }: { open: boolean }) {
           }}
         />
         {/* Left door */}
-        <motion.div
-          className="absolute bottom-0 left-0.5 origin-left"
+        <div
+          className="absolute bottom-0 left-0.5 origin-left transition-transform duration-1000"
           style={{
             width: "calc(50% - 3px)",
             height: "100%",
             background: "linear-gradient(180deg, oklch(0.25 0.04 305) 0%, oklch(0.18 0.03 305) 100%)",
             borderRight: "1px solid oklch(1 0 0 / 0.08)",
             borderTopLeftRadius: 6,
+            transform: open ? "rotateY(-70deg)" : "rotateY(0deg)",
           }}
-          animate={{ rotateY: open ? -70 : 0 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Door handle */}
           <div className="absolute right-2 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-gold/60" style={{ boxShadow: "0 0 8px oklch(0.82 0.16 82 / 0.4)" }} />
-          {/* Panel detail */}
           <div className="absolute left-2 right-2 top-4 h-12 rounded border border-white/5 bg-white/[0.02]" />
           <div className="absolute left-2 right-2 bottom-4 h-12 rounded border border-white/5 bg-white/[0.02]" />
-        </motion.div>
+        </div>
         {/* Right door */}
-        <motion.div
-          className="absolute bottom-0 right-0.5 origin-right"
+        <div
+          className="absolute bottom-0 right-0.5 origin-right transition-transform duration-1000"
           style={{
             width: "calc(50% - 3px)",
             height: "100%",
             background: "linear-gradient(180deg, oklch(0.24 0.04 305) 0%, oklch(0.17 0.03 305) 100%)",
             borderLeft: "1px solid oklch(1 0 0 / 0.08)",
             borderTopRightRadius: 6,
+            transform: open ? "rotateY(70deg)" : "rotateY(0deg)",
           }}
-          animate={{ rotateY: open ? 70 : 0 }}
-          transition={{ duration: 1.2, ease: [0.22, 1, 0.36, 1] }}
         >
-          {/* Door handle */}
           <div className="absolute left-2 top-1/2 h-2 w-2 -translate-y-1/2 rounded-full bg-gold/60" style={{ boxShadow: "0 0 8px oklch(0.82 0.16 82 / 0.4)" }} />
           <div className="absolute left-2 right-2 top-4 h-12 rounded border border-white/5 bg-white/[0.02]" />
           <div className="absolute left-2 right-2 bottom-4 h-12 rounded border border-white/5 bg-white/[0.02]" />
-        </motion.div>
-        {/* Light spill when doors open */}
-        <motion.div
-          className="absolute -left-4 bottom-0 -z-10"
+        </div>
+        {/* Light spill */}
+        <div
+          className="absolute -left-4 bottom-0 -z-10 transition-opacity duration-700"
           style={{
             width: 120,
             height: 160,
             background: "radial-gradient(ellipse at 50% 100%, oklch(0.85 0.14 55 / 0.25), transparent 70%)",
             filter: "blur(12px)",
+            opacity: open ? 1 : 0,
           }}
-          animate={{ opacity: open ? 1 : 0 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
         />
-      </div>
-    </div>
-  );
-}
-
-/** The rolled-up carpet cylinder with 3D depth */
-function CarpetRoll({ progress }: { progress: number }) {
-  // Roll shrinks as it unrolls
-  const rollScale = 1 - progress * 0.6;
-  const rollWidth = 28 * rollScale + 10;
-
-  return (
-    <div
-      className="absolute bottom-1"
-      style={{
-        transform: `scale(${rollScale})`,
-        transformOrigin: "center bottom",
-        filter: `drop-shadow(0 6px 16px rgba(120,20,10,${0.4 + progress * 0.2}))`,
-      }}
-    >
-      {/* Cylinder body */}
-      <div
-        className="relative rounded-full"
-        style={{
-          width: rollWidth,
-          height: 52,
-          background: `
-            linear-gradient(90deg,
-              oklch(0.35 0.12 25) 0%,
-              oklch(0.55 0.18 20) 15%,
-              oklch(0.65 0.22 18) 30%,
-              oklch(0.58 0.20 20) 50%,
-              oklch(0.45 0.16 22) 70%,
-              oklch(0.35 0.12 25) 100%
-            )
-          `,
-          boxShadow: `
-            inset 0 -4px 8px rgba(0,0,0,0.4),
-            inset 0 4px 6px rgba(255,180,140,0.15),
-            0 2px 12px rgba(120,20,10,0.5)
-          `,
-        }}
-      >
-        {/* Top highlight stripe */}
-        <div
-          className="absolute left-1 right-1 top-1 h-1.5 rounded-full"
-          style={{ background: "linear-gradient(90deg, transparent 10%, rgba(255,200,160,0.2) 40%, rgba(255,200,160,0.25) 50%, rgba(255,200,160,0.2) 60%, transparent 90%)" }}
-        />
-        {/* Spiral lines on the face */}
-        <div className="absolute inset-y-1 left-0 w-3 rounded-l-full" style={{ background: "linear-gradient(180deg, oklch(0.30 0.10 25) 0%, oklch(0.50 0.18 18) 50%, oklch(0.30 0.10 25) 100%)" }} />
-        <div className="absolute inset-y-1 right-0 w-3 rounded-r-full" style={{ background: "linear-gradient(180deg, oklch(0.30 0.10 25) 0%, oklch(0.50 0.18 18) 50%, oklch(0.30 0.10 25) 100%)" }} />
       </div>
     </div>
   );
@@ -128,19 +70,29 @@ export function LoadingScreen() {
   const [doorsOpen, setDoorsOpen] = useState(false);
 
   useEffect(() => {
-    const controls = animate(0, 1, {
-      duration: 3.5,
-      ease: [0.25, 0.1, 0.25, 1],
-      onUpdate: (v) => setProgress(v),
-      onComplete: () => setDoorsOpen(true),
-    });
-    return () => controls.stop();
+    const start = performance.now();
+    const duration = 3500;
+    let raf: number;
+    const tick = (now: number) => {
+      const elapsed = now - start;
+      const t = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      setProgress(eased);
+      if (t < 1) {
+        raf = requestAnimationFrame(tick);
+      } else {
+        setDoorsOpen(true);
+      }
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
   }, []);
 
-  // Carpet trail width grows with progress
   const trailWidth = `${progress * 78}%`;
-  // Roll position moves right with progress
   const rollLeft = `calc(${progress * 78}% + 12px)`;
+  const rollScale = 1 - progress * 0.6;
+  const rollWidth = 28 * rollScale + 10;
 
   return (
     <motion.div
@@ -156,10 +108,8 @@ export function LoadingScreen() {
         <div className="absolute left-1/2 top-1/3 h-[500px] w-[500px] -translate-x-1/2 -translate-y-1/2 rounded-full" style={{ background: "radial-gradient(circle, rgba(180,30,20,0.12), transparent 65%)" }} />
       </div>
 
-      {/* Scan lines */}
       <div className="orb-scanlines pointer-events-none absolute inset-0 opacity-15" />
 
-      {/* Grid texture */}
       <div className="pointer-events-none absolute inset-0 opacity-[0.03]" style={{
         backgroundImage: "linear-gradient(oklch(0.78 0.18 45 / 0.4) 1px, transparent 1px), linear-gradient(90deg, oklch(0.78 0.18 45 / 0.4) 1px, transparent 1px)",
         backgroundSize: "50px 50px",
@@ -176,16 +126,15 @@ export function LoadingScreen() {
         className="relative mb-12 w-[85vw] max-w-[520px]"
         style={{ perspective: "900px", perspectiveOrigin: "50% 60%" }}
       >
-        {/* 3D scene container */}
         <div
           className="relative"
           style={{
             transformStyle: "preserve-3d",
-            transform: "rotateX(18deg) rotateZ(0deg)",
+            transform: "rotateX(18deg)",
             height: 160,
           }}
         >
-          {/* Floor / track surface */}
+          {/* Floor track */}
           <div
             className="absolute bottom-0 left-0 right-0"
             style={{
@@ -197,39 +146,23 @@ export function LoadingScreen() {
             }}
           />
 
-          {/* Carpet trail (flat carpet on the floor) */}
-          <motion.div
+          {/* Carpet trail */}
+          <div
             className="absolute bottom-0 left-0"
             style={{
               height: 42,
               width: trailWidth,
-              background: `
-                linear-gradient(180deg,
-                  oklch(0.58 0.22 16) 0%,
-                  oklch(0.52 0.20 18) 20%,
-                  oklch(0.62 0.24 15) 45%,
-                  oklch(0.55 0.21 17) 70%,
-                  oklch(0.48 0.18 20) 100%
-                )
-              `,
+              background: "linear-gradient(180deg, oklch(0.58 0.22 16) 0%, oklch(0.52 0.20 18) 20%, oklch(0.62 0.24 15) 45%, oklch(0.55 0.21 17) 70%, oklch(0.48 0.18 20) 100%)",
               borderRadius: "2px 2px 4px 4px",
-              boxShadow: `
-                0 4px 16px rgba(120,20,10,0.35),
-                0 1px 3px rgba(0,0,0,0.3),
-                inset 0 1px 0 rgba(255,200,160,0.12),
-                inset 0 -1px 0 rgba(0,0,0,0.2)
-              `,
+              boxShadow: "0 4px 16px rgba(120,20,10,0.35), 0 1px 3px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,200,160,0.12), inset 0 -1px 0 rgba(0,0,0,0.2)",
               transform: "translateZ(0px)",
               transformOrigin: "left bottom",
             }}
-            initial={{ width: 0 }}
-            animate={{ width: trailWidth }}
-            transition={{ duration: 0.05, ease: "linear" }}
           >
-            {/* Carpet pattern — gold border lines */}
+            {/* Gold border lines */}
             <div className="absolute left-1 right-1 top-1 h-px" style={{ background: "linear-gradient(90deg, oklch(0.82 0.16 82 / 0.4), oklch(0.82 0.16 82 / 0.5), oklch(0.82 0.16 82 / 0.4))" }} />
             <div className="absolute bottom-1 left-1 right-1 h-px" style={{ background: "linear-gradient(90deg, oklch(0.82 0.16 82 / 0.4), oklch(0.82 0.16 82 / 0.5), oklch(0.82 0.16 82 / 0.4))" }} />
-            {/* Center pattern — diamond motifs */}
+            {/* Diamond motifs */}
             <div className="absolute inset-x-0 top-1/2 flex -translate-y-1/2 justify-around px-4 opacity-20">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
@@ -239,11 +172,11 @@ export function LoadingScreen() {
                 />
               ))}
             </div>
-            {/* Side shading for 3D depth */}
+            {/* 3D shading */}
             <div className="absolute inset-0 rounded-[2px]" style={{ background: "linear-gradient(180deg, rgba(255,180,140,0.06) 0%, transparent 30%, transparent 70%, rgba(0,0,0,0.15) 100%)" }} />
-          </motion.div>
+          </div>
 
-          {/* Leading edge curl — the carpet curling up at the roll */}
+          {/* Leading edge curl */}
           {progress > 0.02 && progress < 0.98 && (
             <div
               className="absolute bottom-0"
@@ -260,26 +193,45 @@ export function LoadingScreen() {
             />
           )}
 
-          {/* The roll itself */}
+          {/* The carpet roll */}
           <div className="absolute bottom-0" style={{ left: rollLeft, transform: "translateZ(4px)" }}>
-            <CarpetRoll progress={progress} />
+            <div
+              style={{
+                transform: `scale(${rollScale})`,
+                transformOrigin: "center bottom",
+                filter: `drop-shadow(0 6px 16px rgba(120,20,10,${0.4 + progress * 0.2}))`,
+              }}
+            >
+              <div
+                className="relative rounded-full"
+                style={{
+                  width: rollWidth,
+                  height: 52,
+                  background: "linear-gradient(90deg, oklch(0.35 0.12 25) 0%, oklch(0.55 0.18 20) 15%, oklch(0.65 0.22 18) 30%, oklch(0.58 0.20 20) 50%, oklch(0.45 0.16 22) 70%, oklch(0.35 0.12 25) 100%)",
+                  boxShadow: "inset 0 -4px 8px rgba(0,0,0,0.4), inset 0 4px 6px rgba(255,180,140,0.15), 0 2px 12px rgba(120,20,10,0.5)",
+                }}
+              >
+                <div className="absolute left-1 right-1 top-1 h-1.5 rounded-full" style={{ background: "linear-gradient(90deg, transparent 10%, rgba(255,200,160,0.2) 40%, rgba(255,200,160,0.25) 50%, rgba(255,200,160,0.2) 60%, transparent 90%)" }} />
+                <div className="absolute inset-y-1 left-0 w-3 rounded-l-full" style={{ background: "linear-gradient(180deg, oklch(0.30 0.10 25) 0%, oklch(0.50 0.18 18) 50%, oklch(0.30 0.10 25) 100%)" }} />
+                <div className="absolute inset-y-1 right-0 w-3 rounded-r-full" style={{ background: "linear-gradient(180deg, oklch(0.30 0.10 25) 0%, oklch(0.50 0.18 18) 50%, oklch(0.30 0.10 25) 100%)" }} />
+              </div>
+            </div>
           </div>
 
-          {/* Double doors at the end */}
+          {/* Double doors */}
           <DoubleDoors open={doorsOpen} />
 
-          {/* Door glow on the carpet when doors open */}
-          <motion.div
-            className="absolute bottom-0 right-10 sm:right-20"
+          {/* Door glow on carpet */}
+          <div
+            className="absolute bottom-0 right-10 sm:right-20 transition-opacity duration-500"
             style={{
               width: 100,
               height: 50,
               background: "radial-gradient(ellipse at 50% 0%, oklch(0.85 0.14 55 / 0.2), transparent 70%)",
               filter: "blur(8px)",
               transform: "translateZ(1px)",
+              opacity: doorsOpen ? 1 : 0,
             }}
-            animate={{ opacity: doorsOpen ? 1 : 0 }}
-            transition={{ duration: 0.6 }}
           />
         </div>
       </div>
@@ -309,30 +261,29 @@ export function LoadingScreen() {
 
       {/* Progress bar */}
       <div className="mt-8 h-1 w-48 overflow-hidden rounded-full bg-white/[0.06]">
-        <motion.div
-          className="h-full rounded-full"
+        <div
+          className="h-full rounded-full transition-none"
           style={{
             width: `${progress * 100}%`,
             background: "linear-gradient(90deg, oklch(0.55 0.20 18), oklch(0.65 0.24 15), oklch(0.78 0.18 45))",
             boxShadow: "0 0 12px oklch(0.65 0.22 18 / 0.5), 0 0 24px -4px oklch(0.78 0.18 45 / 0.3)",
           }}
-          initial={{ width: 0 }}
-          animate={{ width: `${progress * 100}%` }}
         />
       </div>
 
       {/* Loading dots */}
-      <motion.div className="mt-4 flex gap-1.5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+      <div className="mt-4 flex gap-1.5">
         {[0, 1, 2].map((i) => (
-          <motion.span
+          <span
             key={i}
-            className="h-1 w-1 rounded-full"
-            style={{ background: "oklch(0.65 0.22 18)" }}
-            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.2, 0.8] }}
-            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+            className="h-1 w-1 rounded-full orb-pulse-dot"
+            style={{
+              background: "oklch(0.65 0.22 18)",
+              animationDelay: `${i * 0.2}s`,
+            }}
           />
         ))}
-      </motion.div>
+      </div>
     </motion.div>
   );
 }
