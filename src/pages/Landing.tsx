@@ -3,7 +3,6 @@ import { useMutation, useQuery } from "convex/react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
-  CalendarDays,
   Globe,
   Monitor,
   Orbit,
@@ -16,11 +15,8 @@ import {
 import { Link } from "react-router";
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
-import { fmtRange } from "@/lib/orbit";
-import { EventArt } from "@/components/orbit/EventArt";
 import { ParticleCanvas } from "@/components/orbit/ParticleCanvas";
 import { FloatingCards } from "@/components/orbit/FloatingCards";
-
 
 const PLATFORMS = [
   { label: "Web", icon: Globe },
@@ -33,11 +29,9 @@ const PLATFORMS = [
 ];
 
 export default function Landing() {
-  const events = useQuery(api.events.listPublished);
   const seedDemo = useMutation(api.seed.seedDemo);
+  const events = useQuery(api.events.listPublished);
   const seededRef = useRef(false);
-  const allEvents = events ?? [];
-  const upcoming = allEvents.filter((e) => e.endDate > Date.now()).slice(0, 3);
 
   useEffect(() => {
     if (events !== undefined && events.length === 0 && !seededRef.current) {
@@ -48,28 +42,24 @@ export default function Landing() {
 
   return (
     <div className="relative min-h-screen overflow-hidden">
-      {/* floating background cards — KAMUI-style */}
+      {/* floating background cards */}
       <FloatingCards />
-      {/* particle canvas background */}
+      {/* particle canvas */}
       <div className="pointer-events-none absolute inset-0 z-0">
         <ParticleCanvas count={70} color="mixed" />
       </div>
-
       {/* ambient hero glow */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[720px] bg-[radial-gradient(900px_520px_at_70%_-8%,oklch(0.74_0.16_50/0.18),transparent_62%),radial-gradient(700px_420px_at_8%_6%,oklch(0.82_0.13_78/0.1),transparent_60%)]" />
-
+      <div className="pointer-events-none absolute inset-x-0 top-0 z-0 h-[720px] bg-[radial-gradient(900px_520px_at_70%_-8%,oklch(0.78_0.18_45/0.18),transparent_62%),radial-gradient(700px_420px_at_8%_6%,oklch(0.82_0.16_175/0.1),transparent_60%)]" />
       {/* scan line overlay */}
       <div className="orb-scanlines pointer-events-none absolute inset-0 z-[1] opacity-30" />
 
-      {/* header */}
+      {/* ─── Header ─── */}
       <header className="relative z-20 flex items-center justify-between px-5 py-5 sm:px-8">
         <Link to="/" className="flex items-center gap-2.5">
           <span className="orb-neon-border flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-ember/20 to-[#0e0a16]/80">
             <Orbit className="h-4.5 w-4.5 text-ember" />
           </span>
-          <span className="font-display text-lg font-bold tracking-[0.24em] text-foreground">
-            ORBIT
-          </span>
+          <span className="font-display text-lg font-bold tracking-[0.24em] text-foreground">ORBIT</span>
         </Link>
 
         <nav className="hidden items-center gap-7 text-sm font-semibold text-foreground/60 md:flex">
@@ -79,21 +69,11 @@ export default function Landing() {
             { label: "Gallery", to: "/auth?returnTo=%2Fevents" },
             { label: "Organizer", to: "/auth?returnTo=%2Forg%2Fevents" },
           ].map((link) => (
-            <Link
-              key={link.label}
-              to={link.to}
-              className="transition-colors hover:text-ember"
-            >
-              {link.label}
-            </Link>
+            <Link key={link.label} to={link.to} className="transition-colors hover:text-ember">{link.label}</Link>
           ))}
         </nav>
 
-        <Button
-          asChild
-          variant="outline"
-          className="orb-neon-border gap-2 rounded-full bg-foreground/5 text-foreground backdrop-blur hover:border-ember/70 hover:bg-ember/10 hover:text-ember"
-        >
+        <Button asChild variant="outline" className="orb-neon-border gap-2 rounded-full bg-foreground/5 text-foreground backdrop-blur hover:border-ember/70 hover:bg-ember/10 hover:text-ember">
           <Link to="/auth">
             <Sparkles className="h-4 w-4 text-ember" />
             Sign in
@@ -101,100 +81,79 @@ export default function Landing() {
         </Button>
       </header>
 
-      {/* hero */}
-      <main className="relative z-10 mx-auto grid max-w-6xl gap-14 px-5 pb-20 pt-12 sm:pt-16 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:gap-10">
-        {/* left copy */}
-        <div>
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
-            className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.32em] text-ember"
-          >
-            <span className="orb-hud-blink h-1.5 w-1.5 rounded-full bg-ember" />
-            <span className="h-px w-8 bg-ember/60" />
-            Powered by Convex
-          </motion.p>
+      {/* ─── Hero — full width ─── */}
+      <main className="relative z-10 mx-auto max-w-6xl px-5 pb-16 pt-10 sm:pt-16 text-center">
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="flex items-center justify-center gap-2 text-[11px] font-bold uppercase tracking-[0.32em] text-ember"
+        >
+          <span className="orb-hud-blink h-1.5 w-1.5 rounded-full bg-ember" />
+          <span className="h-px w-8 bg-ember/60" />
+          Powered by Convex
+        </motion.p>
 
-          <motion.h1
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-6 font-display text-5xl font-bold leading-[1.04] tracking-tight text-foreground sm:text-6xl lg:text-7xl"
-          >
-            <span className="orb-glitch" data-text="EVERY EVENT">
-              EVERY EVENT
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.08, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mt-6 max-w-4xl font-display text-5xl font-bold leading-[1.04] tracking-tight text-foreground sm:text-6xl md:text-7xl lg:text-8xl"
+        >
+          <span className="orb-glitch" data-text="EVERY EVENT">EVERY EVENT</span>
+          <br />
+          <span className="text-gradient-ember">in one orbit</span>
+        </motion.h1>
+
+        <motion.p
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
+          className="mx-auto mt-7 max-w-2xl text-base leading-7 text-foreground/65 sm:text-lg"
+        >
+          Proudly powered by Convex, enter the immersive world of ORBIT — a
+          multi-mode event platform. Marrying the best of registration, digital
+          passes and certificates in a fresh new package, ORBIT draws thematic
+          influence from campus culture to create an experience like no other
+          available today.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
+          className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center"
+        >
+          <Button asChild size="lg" className="orb-neon-pulse h-12 gap-2 rounded-full bg-ember px-7 font-bold text-[#1a0d02] shadow-[0_14px_44px_-12px_rgba(255,120,50,0.7)] hover:bg-ember/90">
+            <Link to="/auth?returnTo=%2Fevents">
+              Enter the portal <ArrowRight className="h-4 w-4" />
+            </Link>
+          </Button>
+          <Button asChild size="lg" variant="outline" className="orb-neon-border h-12 rounded-full bg-foreground/5 px-7 text-foreground backdrop-blur hover:border-ember/60 hover:bg-ember/10 hover:text-ember">
+            <Link to="/auth?returnTo=%2Forg%2Fevents">Run an event</Link>
+          </Button>
+        </motion.div>
+
+        {/* platform badges */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.9, delay: 0.4 }}
+          className="mt-10 flex flex-wrap items-center justify-center gap-2"
+        >
+          {PLATFORMS.map(({ label, icon: Icon }) => (
+            <span key={label} className="flex items-center gap-1.5 rounded-md border border-ember/15 bg-foreground/5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-foreground/55">
+              <Icon className="h-3.5 w-3.5 text-ember/80" />
+              {label}
             </span>
-            <br />
-            <span className="text-gradient-ember">in one orbit</span>
-          </motion.h1>
-
-          <motion.p
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.16, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-7 max-w-lg text-[15px] leading-7 text-foreground/65"
-          >
-            Proudly powered by Convex, enter the immersive world of ORBIT — a
-            multi-mode event platform. Marrying the best of registration, digital
-            passes and certificates in a fresh new package, ORBIT draws thematic
-            influence from campus culture to create an experience like no other
-            available today.
-          </motion.p>
-
-          <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.24, ease: [0.22, 1, 0.36, 1] }}
-            className="mt-9 flex flex-col gap-3 sm:flex-row"
-          >
-            <Button
-              asChild
-              size="lg"
-              className="orb-neon-pulse h-12 gap-2 rounded-full bg-ember px-7 font-bold text-[#1a0d02] shadow-[0_14px_44px_-12px_rgba(255,120,50,0.7)] hover:bg-ember/90"
-            >
-              <Link to="/auth?returnTo=%2Fevents">
-                Enter the portal <ArrowRight className="h-4 w-4" />
-              </Link>
-            </Button>
-            <Button
-              asChild
-              size="lg"
-              variant="outline"
-              className="orb-neon-border h-12 rounded-full bg-foreground/5 px-7 text-foreground backdrop-blur hover:border-ember/60 hover:bg-ember/10 hover:text-ember"
-            >
-              <Link to="/auth?returnTo=%2Forg%2Fevents">Run an event</Link>
-            </Button>
-          </motion.div>
-
-          {/* platform badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.9, delay: 0.4 }}
-            className="mt-10 flex flex-wrap items-center gap-2"
-          >
-            {PLATFORMS.map(({ label, icon: Icon }) => (
-              <span
-                key={label}
-                className="flex items-center gap-1.5 rounded-md border border-ember/15 bg-foreground/5 px-3 py-1.5 text-[11px] font-semibold uppercase tracking-wider text-foreground/55"
-              >
-                <Icon className="h-3.5 w-3.5 text-ember/80" />
-                {label}
-              </span>
-            ))}
-          </motion.div>
-        </div>
-
-
+          ))}
+        </motion.div>
       </main>
 
-      {/* mode cards */}
+      {/* ─── Choose your mode (after hero, before footer) ─── */}
       <section className="relative z-10 mx-auto max-w-5xl px-5 pb-24">
         <div className="mb-8 text-center">
-          <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-ember">
-            Two worlds, one account
-          </p>
+          <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-ember">Two worlds, one account</p>
           <h2 className="mt-3 font-display text-3xl font-bold text-foreground sm:text-4xl">
             Choose your <span className="text-gradient-ember">role</span>
           </h2>
@@ -207,15 +166,12 @@ export default function Landing() {
               </span>
               <div>
                 <p className="font-display text-xl font-bold text-foreground">Participant</p>
-                <p className="text-xs uppercase tracking-widest text-foreground/40">
-                  Discover · Register · Attend
-                </p>
+                <p className="text-xs uppercase tracking-widest text-foreground/40">Discover · Register · Attend</p>
               </div>
             </div>
             <p className="mt-5 text-sm leading-6 text-foreground/60">
               Browse events, fill organizer-designed forms, carry your pass in a
-              wallet, track round results, grab seats in carpools, and download
-              certificates.
+              wallet, track round results, grab seats in carpools, and download certificates.
             </p>
             <span className="mt-6 inline-flex items-center gap-1.5 text-sm font-bold text-ember">
               Enter as participant
@@ -230,9 +186,7 @@ export default function Landing() {
               </span>
               <div>
                 <p className="font-display text-xl font-bold text-foreground">Organizer</p>
-                <p className="text-xs uppercase tracking-widest text-foreground/40">
-                  Create · Scan · Manage
-                </p>
+                <p className="text-xs uppercase tracking-widest text-foreground/40">Create · Scan · Manage</p>
               </div>
             </div>
             <p className="mt-5 text-sm leading-6 text-foreground/60">
@@ -248,76 +202,57 @@ export default function Landing() {
         </div>
       </section>
 
-      {/* live events strip */}
-      {upcoming.length > 0 && (
-        <section className="relative z-10 mx-auto max-w-5xl px-5 pb-24">
-          <div className="mb-6 flex items-end justify-between">
+      {/* ─── Footer ─── */}
+      <footer className="relative z-10 border-t border-foreground/10 px-5 py-12">
+        <div className="mx-auto max-w-6xl">
+          <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <p className="text-[11px] font-bold uppercase tracking-[0.32em] text-ember">
-                <span className="orb-hud-blink mr-2 inline-block h-1.5 w-1.5 rounded-full bg-ember align-middle" />
-                Live on the portal
+              <Link to="/" className="flex items-center gap-2">
+                <span className="flex h-8 w-8 items-center justify-center rounded-full bg-ember/15">
+                  <Orbit className="h-4 w-4 text-ember" />
+                </span>
+                <span className="font-display text-lg font-bold tracking-[0.2em] text-foreground">ORBIT</span>
+              </Link>
+              <p className="mt-3 text-sm leading-5 text-foreground/50">
+                Every event, in one orbit. A unified platform for registration, digital passes, and certificates.
               </p>
-              <h2 className="mt-2 font-display text-3xl font-bold text-foreground">
-                Upcoming <span className="text-gradient-ember">events</span>
-              </h2>
             </div>
-            <Link
-              to="/auth?returnTo=%2Fevents"
-              className="hidden items-center gap-1 text-sm font-semibold text-foreground/60 transition-colors hover:text-ember sm:flex"
-            >
-              View all <ArrowRight className="h-4 w-4" />
-            </Link>
+            <div>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-foreground/40">Explore</h4>
+              <ul className="space-y-2">
+                {[{ label: "Events", to: "/events" }, { label: "Passes", to: "/passes" }, { label: "Certificates", to: "/certificates" }].map((l) => (
+                  <li key={l.label}><Link to={l.to} className="text-sm text-foreground/55 transition-colors hover:text-ember">{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-foreground/40">Organizers</h4>
+              <ul className="space-y-2">
+                {[{ label: "Create Event", to: "/org/events/new" }, { label: "My Events", to: "/org/events" }, { label: "Form Builder", to: "/org/events" }].map((l) => (
+                  <li key={l.label}><Link to={l.to} className="text-sm text-foreground/55 transition-colors hover:text-ember">{l.label}</Link></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="mb-3 text-[11px] font-bold uppercase tracking-[0.25em] text-foreground/40">Connect</h4>
+              <ul className="space-y-2">
+                <li className="text-sm text-foreground/55">hello@orbit.events</li>
+                <li className="text-sm text-foreground/55">orbit.events</li>
+                <li className="text-sm text-foreground/55">Built with Convex</li>
+              </ul>
+            </div>
           </div>
-          <div className="grid gap-5 sm:grid-cols-3">
-            {upcoming.map((event, i) => (
-              <motion.div
-                key={event._id}
-                initial={{ opacity: 0, y: 16 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.08 }}
-                className="orb-card orb-scanlines overflow-hidden p-0"
-              >
-                <div className="relative h-36">
-                  <EventArt
-                    seed={event._id}
-                    accent={event.accent}
-                    title={event.title}
-                    tagline={event.tagline}
-                    eventType={event.type}
-                    startDate={event.startDate}
-                    showOrbit={false}
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="font-display text-xl font-bold leading-tight text-foreground">
-                    {event.title}
-                  </h3>
-                  <p className="mt-2 line-clamp-2 text-xs leading-5 text-foreground/55">
-                    {event.tagline}
-                  </p>
-                  <p className="mt-5 flex items-center gap-1.5 text-[11px] text-foreground/45">
-                    <CalendarDays className="h-3.5 w-3.5 text-ember" />
-                    {fmtRange(event.startDate, event.endDate)} · {event.city}
-                  </p>
-                </div>
-              </motion.div>
-            ))}
+          <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-foreground/10 pt-6 sm:flex-row">
+            <p className="text-[11px] text-foreground/35">© {new Date().getFullYear()} ORBIT · Event Management Portal</p>
+            <div className="flex items-center gap-4 text-[11px] text-foreground/35">
+              <Link to="/auth" className="transition-colors hover:text-foreground/60">Sign in</Link>
+              <span>·</span>
+              <a href="https://github.com" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground/60">GitHub</a>
+              <span>·</span>
+              <a href="https://convex.dev" target="_blank" rel="noreferrer" className="transition-colors hover:text-foreground/60">Convex</a>
+            </div>
           </div>
-        </section>
-      )}
-
-      {/* footer */}
-      <footer className="relative z-10 border-t border-ember/15 px-5 py-8 text-center">
-        <div className="flex items-center justify-center gap-2">
-          <Orbit className="h-4 w-4 text-ember" />
-          <span className="font-display text-xs font-bold tracking-[0.3em] text-foreground/60">
-            ORBIT
-          </span>
         </div>
-        <p className="mt-2 text-[11px] text-foreground/35">
-          Event management portal · every event, in one orbit
-        </p>
       </footer>
     </div>
   );
