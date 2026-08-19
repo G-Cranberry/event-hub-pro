@@ -182,6 +182,42 @@ const schema = defineSchema(
       .index("by_carpool", ["carpoolId"])
       .index("by_user", ["userId"]),
 
+    /** Organizer budget entries: expenses and sponsor contributions. */
+    budgets: defineTable({
+      eventId: v.id("events"),
+      ownerId: v.id("users"),
+      type: v.union(v.literal("expense"), v.literal("sponsor")),
+      label: v.string(),
+      amount: v.number(),
+      category: v.optional(v.string()),
+      sponsorName: v.optional(v.string()),
+      note: v.optional(v.string()),
+      createdAt: v.number(),
+    }).index("by_event", ["eventId"]).index("by_owner", [
+"ownerId"]),
+
+    /** Organizer announcements sent to registered participants. */
+    announcements: defineTable({
+      eventId: v.id("events"),
+      ownerId: v.id("users"),
+      title: v.string(),
+      body: v.string(),
+      priority: v.union(v.literal("normal"), v.literal("urgent")),
+      createdAt: v.number(),
+    }).index("by_event", ["eventId"]).index("by_owner", ["ownerId"]),
+
+    /** Feedback responses from participants after an event. */
+    feedback: defineTable({
+      eventId: v.id("events"),
+      userId: v.id("users"),
+      rating: v.number(),
+      comment: v.optional(v.string()),
+      categories: v.optional(v.record(v.string(), v.number())),
+      createdAt: v.number(),
+    })
+      .index("by_event", ["eventId"])
+      .index("by_user_event", ["userId", "eventId"]),
+
     /** Event photo gallery — access restricted to registered participants. */
     gallery: defineTable({
       eventId: v.id("events"),
