@@ -1,12 +1,12 @@
 import { api } from "@/convex/_generated/api";
 import { useAuth } from "@/hooks/use-auth";
-import { AnimatePresence, motion } from "framer-motion";
+
 import { LogOut, Orbit, UserCog, Users } from "lucide-react";
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, type ReactNode } from "react";
 import { useNavigate } from "react-router";
 import { useMutation } from "convex/react";
 import { cn } from "@/lib/utils";
-import { LoadingScreen } from "./LoadingScreen";
+
 import { OrbitNav } from "./OrbitNav";
 import { ProfileProvider, useProfile } from "./ProfileProvider";
 import { ThemeToggle, applySavedTheme } from "./ThemeToggle";
@@ -92,22 +92,9 @@ function TopControls() {
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
-  const [loading, setLoading] = useState(() => {
-    if (typeof window === "undefined") return false;
-    if (sessionStorage.getItem("orbit:loader")) return false;
-    sessionStorage.setItem("orbit:loader", "1");
-    return true;
-  });
-
   useEffect(() => {
     applySavedTheme();
   }, []);
-
-  useEffect(() => {
-    if (!loading) return;
-    const t = setTimeout(() => setLoading(false), 2150);
-    return () => clearTimeout(t);
-  }, [loading]);
 
   return (
     <ProfileProvider>
@@ -115,7 +102,6 @@ export function AppShell({ children }: { children: ReactNode }) {
         <BrandMark />
         <TopControls />
         <OrbitNav />
-        <AnimatePresence>{loading && <LoadingScreen />}</AnimatePresence>
         {children}
       </div>
     </ProfileProvider>

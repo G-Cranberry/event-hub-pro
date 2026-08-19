@@ -7,6 +7,7 @@ import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import { AppShell } from "@/components/orbit/AppShell";
+import { LoadingScreen } from "@/components/orbit/LoadingScreen";
 import React, { StrictMode, useEffect, lazy, Suspense } from "react";
 import { Navigate } from "react-router";
 import { createRoot } from "react-dom/client";
@@ -38,13 +39,9 @@ const OrgRegistrations = lazy(() => import("./pages/OrgRegistrations.tsx"));
 const Profile = lazy(() => import("./pages/Profile.tsx"));
 const NotFound = lazy(() => import("./pages/NotFound.tsx"));
 
-// Simple loading fallback for route transitions
+// 3D carpet unrolling animation as the initial loading screen
 function RouteLoading() {
-  return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-pulse text-muted-foreground">Loading...</div>
-    </div>
-  );
+  return <LoadingScreen />;
 }
 
 /** Silent error boundary — if VlyToolbar crashes it renders nothing instead of
