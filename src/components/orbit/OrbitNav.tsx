@@ -183,9 +183,9 @@ export function OrbitNav() {
             {/* Quarter-circle arc container */}
             <motion.div
               ref={containerRef}
-              initial={{ scale: 0.1, opacity: 0, borderRadius: "100%" }}
-              animate={{ scale: 1, opacity: 1, borderRadius: "0%" }}
-              exit={{ scale: 0.1, opacity: 0, borderRadius: "100%" }}
+              initial={{ opacity: 0, scale: 0.3 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.3 }}
               transition={{ type: "spring", stiffness: 280, damping: 24 }}
               className="fixed bottom-0 right-0 z-50 overflow-hidden orb-scanlines"
               style={{
@@ -197,6 +197,7 @@ export function OrbitNav() {
                 border: "1px solid oklch(0.82 0.13 78 / 0.12)",
                 borderTop: "none",
                 borderRight: "none",
+                transformOrigin: "100% 100%",
               }}
             >
               {/* Ghost ticks along the arc */}
@@ -264,8 +265,22 @@ export function OrbitNav() {
                 );
               })}
 
+              {/* Arc border line — SVG quarter-circle stroke */}
+              <svg
+                className="pointer-events-none absolute inset-0 z-30"
+                width={RADIUS * 2 + 100}
+                height={RADIUS * 2 + 100}
+              >
+                <path
+                  d={`M 0 ${RADIUS + 50} A ${RADIUS} ${RADIUS} 0 0 1 ${RADIUS + 50} 0`}
+                  fill="none"
+                  stroke="oklch(0.74 0.16 50 / 0.25)"
+                  strokeWidth="1.5"
+                />
+              </svg>
+
               {/* Corner hub label */}
-              <div className="absolute bottom-3 right-3 z-20 flex flex-col items-end">
+              <div className="absolute bottom-4 right-4 z-20 flex flex-col items-end">
                 <span className="font-display text-sm font-bold tracking-[0.15em] text-white/80">
                   ORBIT
                 </span>
