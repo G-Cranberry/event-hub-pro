@@ -125,7 +125,7 @@ export function OrbitNav() {
 
   useEffect(() => { setCollapsed(true); }, [location.pathname]);
 
-  // Body scroll lock
+  // Body scroll lock when open
   useEffect(() => {
     if (collapsed) return;
     const scrollY = window.scrollY;
@@ -148,7 +148,7 @@ export function OrbitNav() {
     };
   }, [collapsed]);
 
-  // Scroll to rotate
+  // Scroll to rotate (only when open)
   useEffect(() => {
     if (collapsed) return;
     const onWheel = (e: WheelEvent) => {
@@ -167,6 +167,7 @@ export function OrbitNav() {
     return () => window.removeEventListener("wheel", onWheel, { capture: true });
   }, [collapsed, total]);
 
+  // Escape to close
   useEffect(() => {
     if (collapsed) return;
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") setCollapsed(true); };
@@ -215,120 +216,135 @@ export function OrbitNav() {
   const displayName = profile?.name || user?.name || user?.email?.split("@")[0] || "User";
   const initials = displayName.slice(0, 2).toUpperCase();
 
-  // CRITICAL: Render absolutely nothing when collapsed — no DOM nodes at all.
-  // This guarantees zero leakage of nav labels, buttons, or backdrop during loading.
-  if (collapsed) return null;
-
   return (
     <>
-      {/* Backdrop — only renders when expanded */}
-      <div
-        className="fixed inset-0 z-[55]"
-        style={{
-          backdropFilter: "blur(6px) brightness(0.6)",
-          WebkitBackdropFilter: "blur(6px) brightness(0.6)",
-          background: "rgba(0,0,0,0.15)",
-        }}
-        onClick={() => setCollapsed(true)}
-      />
-
-      {/* Toggle button */}
+      {/* ============================================ */}
+      {/* TOGGLE BUTTON — always rendered, always visible */}
+      {/* ============================================ */}
       <button
         type="button"
-        aria-label="Close navigation"
+        aria-label={collapsed ? "Open navigation" : "Close navigation"}
         onClick={toggle}
         className="fixed bottom-5 right-5 z-[62] flex h-[46px] w-[46px] items-center justify-center rounded-full border border-ember/50 bg-gradient-to-br from-ember/30 to-ember/10 text-white backdrop-blur-sm transition-all duration-300 hover:scale-110 active:scale-95 sm:bottom-6 sm:right-6"
-        style={{ boxShadow: "0 6px 24px -4px rgba(255,92,56,0.45), 0 0 16px -2px rgba(255,92,56,0.25)" }}
+        style={{
+          boxShadow: collapsed
+            ? "0 4px 16px -4px rgba(255,92,56,0.35), 0 0 10px -2px rgba(255,92,56,0.2)"
+            : "0 6px 24px -4px rgba(255,92,56,0.45), 0 0 16px -2px rgba(255,92,56,0.25)",
+        }}
       >
         {ripples.map((t) => (
           <span key={t} className="orb-ripple absolute inset-0 rounded-full" />
         ))}
-        <span className="absolute inset-[3px] rounded-full border border-ember/20" />
-        <X className="h-5 w-5 text-ember" />
+        {!collapsed && <span className="absolute inset-[3px] rounded-full border border-ember/20" />}
+        <span
+          className="inline-block transition-transform duration-300"
+          style={{ transform: collapsed ? "rotate(135deg)" : "rotate(0deg)" }}
+        >
+          <X className="h-5 w-5 text-ember" />
+        </span>
       </button>
 
-      {/* Quarter-circle panel */}
-      <div
-        ref={panelRef}
-        className="fixed bottom-0 right-0 z-[56]"
-        style={{
-          width: "min(45vw, 480px)",
-          minWidth: 280,
-          height: "min(45vw, 480px)",
-          minHeight: 280,
-          borderRadius: "100% 0 0 0 / 100% 0 0 0",
-          background: "linear-gradient(135deg, oklch(0.12 0.04 305) 0%, oklch(0.07 0.025 305) 60%, oklch(0.18 0.05 305 / 0.6) 100%)",
-          border: "1px solid oklch(0.8 0.14 78 / 0.1)",
-          borderBottom: "none",
-          borderRight: "none",
-          overflow: "visible",
-        }}
-      >
-        {/* Warm glow */}
-        <div className="pointer-events-none absolute bottom-0 right-0" style={{ width: "60%", height: "60%", background: "radial-gradient(circle at 100% 100%, oklch(0.78 0.18 45 / 0.08), transparent 70%)" }} />
+      {/* ============================================ */}
+      {/* BACKDROP — only renders when expanded */}
+      {/* ============================================ */}
+      {!collapsed && (
+        <div
+          className="fixed inset-0 z-[55]"
+          style={{
+            backdropFilter: "blur(6px) brightness(0.6)",
+            WebkitBackdropFilter: "blur(6px) brightness(0.6)",
+            background: "rgba(0,0,0,0.15)",
+          }}
+          onClick={() => setCollapsed(true)}
+        />
+      )}
 
-        {/* Dashed arc guide */}
-        <svg className="pointer-events-none absolute inset-0" width={panelPx} height={panelPx} viewBox={`0 0 ${panelPx} ${panelPx}`}>
-          <circle cx={panelPx} cy={panelPx} r={iconR} fill="none" stroke="oklch(0.78 0.18 45 / 0.1)" strokeWidth="1" strokeDasharray="3 7" />
-        </svg>
+      {/* ============================================ */}
+      {/* QUARTER-CIRCLE PANEL — only renders when expanded */}
+      {/* ============================================ */}
+      {!collapsed && (
+        <div
+          ref={panelRef}
+          className="fixed bottom-0 right-0 z-[56]"
+          style={{
+            width: "min(45vw, 480px)",
+            minWidth: 280,
+            height: "min(45vw, 480px)",
+            minHeight: 280,
+            borderRadius: "100% 0 0 0 / 100% 0 0 0",
+            background: "linear-gradient(135deg, oklch(0.12 0.04 305) 0%, oklch(0.07 0.025 305) 60%, oklch(0.18 0.05 305 / 0.6) 100%)",
+            border: "1px solid oklch(0.8 0.14 78 / 0.1)",
+            borderBottom: "none",
+            borderRight: "none",
+            overflow: "visible",
+          }}
+        >
+          {/* Warm glow */}
+          <div className="pointer-events-none absolute bottom-0 right-0" style={{ width: "60%", height: "60%", background: "radial-gradient(circle at 100% 100%, oklch(0.78 0.18 45 / 0.08), transparent 70%)" }} />
 
-        {/* Nav items */}
-        {positioned.map(({ item, x, y, opacity, itemScale, isActive, isPageActive }) => {
-          const Icon = item.icon;
-          const highlighted = isActive && isPageActive;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => go(item)}
-              className="absolute flex flex-col items-center gap-1 outline-none"
-              style={{
-                left: x, top: y,
-                transform: `translate(-50%, -50%) scale(${itemScale})`,
-                opacity,
-                transition: "transform .5s cubic-bezier(.65,0,.35,1), opacity .5s ease",
-                pointerEvents: opacity < 0.2 ? "none" : "auto",
-                zIndex: isActive ? 20 : 5,
-              }}
-            >
-              <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all duration-300 sm:h-[52px] sm:w-[52px]" style={{
-                borderColor: highlighted ? "oklch(0.78 0.18 45 / 0.95)" : isActive ? "oklch(0.78 0.18 45 / 0.4)" : "oklch(0.78 0.18 45 / 0.18)",
-                background: highlighted ? "oklch(0.78 0.18 45 / 0.25)" : isActive ? "oklch(0 0 0 / 0.5)" : "oklch(0 0 0 / 0.35)",
-                color: highlighted ? "oklch(0.78 0.18 45)" : isActive ? "oklch(1 0 0 / 0.85)" : "oklch(1 0 0 / 0.55)",
-                boxShadow: highlighted ? "0 0 24px oklch(0.78 0.18 45 / 0.5), 0 0 48px -8px oklch(0.78 0.18 45 / 0.2)" : "0 2px 10px rgba(0,0,0,0.3)",
-              }}>
-                <Icon className="h-5 w-5 sm:h-[22px] sm:w-[22px]" />
-              </span>
-              <span className="whitespace-nowrap rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider backdrop-blur-md sm:text-[9px]" style={{
-                border: isActive ? "1px solid oklch(0.78 0.18 45 / 0.3)" : "1px solid oklch(1 0 0 / 0.08)",
-                background: isActive ? "oklch(0 0 0 / 0.8)" : "oklch(0 0 0 / 0.55)",
-                color: highlighted ? "oklch(0.78 0.18 45)" : isActive ? "oklch(1 0 0 / 0.9)" : "oklch(1 0 0 / 0.5)",
-              }}>
-                {item.label}
-              </span>
-            </button>
-          );
-        })}
+          {/* Dashed arc guide */}
+          <svg className="pointer-events-none absolute inset-0" width={panelPx} height={panelPx} viewBox={`0 0 ${panelPx} ${panelPx}`}>
+            <circle cx={panelPx} cy={panelPx} r={iconR} fill="none" stroke="oklch(0.78 0.18 45 / 0.1)" strokeWidth="1" strokeDasharray="3 7" />
+          </svg>
 
-        {/* Dot indicators */}
-        <div className="absolute z-20 flex gap-1.5" style={{ left: panelPx * 0.55, top: panelPx * 0.06, transform: "translateX(-50%)" }}>
-          {items.map((_, i) => {
-            const activeDot = i === focusedIdx;
+          {/* Nav items */}
+          {positioned.map(({ item, x, y, opacity, itemScale, isActive, isPageActive }) => {
+            const Icon = item.icon;
+            const highlighted = isActive && isPageActive;
             return (
-              <span key={i} className="rounded-full transition-all duration-400" style={{
-                width: activeDot ? 7 : 3, height: activeDot ? 7 : 3,
-                background: activeDot ? "oklch(0.78 0.18 45)" : "oklch(1 0 0 / 0.12)",
-                boxShadow: activeDot ? "0 0 6px oklch(0.78 0.18 45 / 0.5)" : "none",
-              }} />
+              <button
+                key={item.id}
+                type="button"
+                onClick={() => go(item)}
+                className="absolute flex flex-col items-center gap-1 outline-none"
+                style={{
+                  left: x, top: y,
+                  transform: `translate(-50%, -50%) scale(${itemScale})`,
+                  opacity,
+                  transition: "transform .5s cubic-bezier(.65,0,.35,1), opacity .5s ease",
+                  pointerEvents: opacity < 0.2 ? "none" : "auto",
+                  zIndex: isActive ? 20 : 5,
+                }}
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-full border-2 transition-all duration-300 sm:h-[52px] sm:w-[52px]" style={{
+                  borderColor: highlighted ? "oklch(0.78 0.18 45 / 0.95)" : isActive ? "oklch(0.78 0.18 45 / 0.4)" : "oklch(0.78 0.18 45 / 0.18)",
+                  background: highlighted ? "oklch(0.78 0.18 45 / 0.25)" : isActive ? "oklch(0 0 0 / 0.5)" : "oklch(0 0 0 / 0.35)",
+                  color: highlighted ? "oklch(0.78 0.18 45)" : isActive ? "oklch(1 0 0 / 0.85)" : "oklch(1 0 0 / 0.55)",
+                  boxShadow: highlighted ? "0 0 24px oklch(0.78 0.18 45 / 0.5), 0 0 48px -8px oklch(0.78 0.18 45 / 0.2)" : "0 2px 10px rgba(0,0,0,0.3)",
+                }}>
+                  <Icon className="h-5 w-5 sm:h-[22px] sm:w-[22px]" />
+                </span>
+                <span className="whitespace-nowrap rounded-full px-2 py-0.5 text-[8px] font-semibold uppercase tracking-wider backdrop-blur-md sm:text-[9px]" style={{
+                  border: isActive ? "1px solid oklch(0.78 0.18 45 / 0.3)" : "1px solid oklch(1 0 0 / 0.08)",
+                  background: isActive ? "oklch(0 0 0 / 0.8)" : "oklch(0 0 0 / 0.55)",
+                  color: highlighted ? "oklch(0.78 0.18 45)" : isActive ? "oklch(1 0 0 / 0.9)" : "oklch(1 0 0 / 0.5)",
+                }}>
+                  {item.label}
+                </span>
+              </button>
             );
           })}
-        </div>
 
-        {/* Scroll hint */}
-        <div className="absolute z-20 whitespace-nowrap" style={{ left: panelPx * 0.5, top: panelPx * 0.13, transform: "translateX(-50%)" }}>
-          <span className="text-[7px] font-bold uppercase tracking-[0.25em] text-white/20 sm:text-[8px]">scroll to rotate</span>
+          {/* Dot indicators */}
+          <div className="absolute z-20 flex gap-1.5" style={{ left: panelPx * 0.55, top: panelPx * 0.06, transform: "translateX(-50%)" }}>
+            {items.map((_, i) => {
+              const activeDot = i === focusedIdx;
+              return (
+                <span key={i} className="rounded-full transition-all duration-400" style={{
+                  width: activeDot ? 7 : 3, height: activeDot ? 7 : 3,
+                  background: activeDot ? "oklch(0.78 0.18 45)" : "oklch(1 0 0 / 0.12)",
+                  boxShadow: activeDot ? "0 0 6px oklch(0.78 0.18 45 / 0.5)" : "none",
+                }} />
+              );
+            })}
+          </div>
+
+          {/* Scroll hint */}
+          <div className="absolute z-20 whitespace-nowrap" style={{ left: panelPx * 0.5, top: panelPx * 0.13, transform: "translateX(-50%)" }}>
+            <span className="text-[7px] font-bold uppercase tracking-[0.25em] text-white/20 sm:text-[8px]">scroll to rotate</span>
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }
