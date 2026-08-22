@@ -3,7 +3,7 @@ import '@/components/orbit/theme.css';
 import '@/components/orbit/card-carousel.css';
 import { Toaster } from "@/components/ui/sonner";
 import { RequireAuth } from "@/components/RequireAuth";
-import { VlyToolbar } from "../vly-toolbar-readonly.tsx";
+import { VlyToolbar } from "../vly-toolbar-readonly.jsx";
 import { ConvexAuthProvider } from "@convex-dev/auth/react";
 import { ConvexReactClient } from "convex/react";
 import { AppShell } from "@/components/orbit/AppShell";

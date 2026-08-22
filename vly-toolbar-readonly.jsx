@@ -6,52 +6,29 @@ import { MousePointer, ExternalLink, AlertTriangle } from "lucide-react";
 
 import { snapdom } from "@zumer/snapdom";
 
-// FiberNode and ComponentInfo interfaces
-export interface FiberNode {
-  displayName?: string;
-  name?: string;
-  tag: number;
-  type: unknown;
-  return: FiberNode | null;
-  _debugOwner?: {
-    name: string;
-    env: string;
-  };
-}
-
 const FunctionComponent = 0;
 const ClassComponent = 1;
 const HostComponent = 5;
 
-export interface ComponentInfo {
-  name: string;
-  type: "regular" | "rsc";
-}
-
-export function getReactComponentHierarchy(
-  element: HTMLElement | null,
-): ComponentInfo[] | null {
+export function getReactComponentHierarchy(element) {
   if (!element) {
     return null;
   }
 
-  const components: ComponentInfo[] = [];
+  const components = [];
   const maxComponents = 3;
 
   // Find the internal React Fiber node key.
   const fiberKey = Object.keys(element).find(
     (key) =>
-      key.startsWith("__reactFiber$") ||
-      key.startsWith("__reactInternalInstance$"),
+      key.startsWith("__reactFiber$") || key.startsWith("__reactInternalInstance$"),
   );
 
   if (!fiberKey) {
     return null;
   }
 
-  let currentFiber: FiberNode | null = (
-    element as unknown as Record<string, unknown>
-  )[fiberKey] as FiberNode | null;
+  let currentFiber = element[fiberKey];
 
   if (!currentFiber) {
     return null;
@@ -59,7 +36,7 @@ export function getReactComponentHierarchy(
 
   // Traverse up the Fiber tree.
   while (currentFiber && components.length < maxComponents) {
-    let componentData: ComponentInfo | null = null;
+    let componentData = null;
 
     if (
       currentFiber.tag === ClassComponent ||
@@ -67,13 +44,9 @@ export function getReactComponentHierarchy(
     ) {
       const componentDefinition = currentFiber.type;
       if (componentDefinition) {
-        const def = componentDefinition as {
-          displayName?: string;
-          name?: string;
-        };
         const name =
-          def.displayName ||
-          def.name ||
+          componentDefinition.displayName ||
+          componentDefinition.name ||
           currentFiber._debugOwner?.name ||
           "AnonymousComponent";
         componentData = { name, type: "regular" };
@@ -88,7 +61,7 @@ export function getReactComponentHierarchy(
 
     if (componentData) {
       const alreadyExists = components.some(
-        (c) => c.name === componentData!.name && c.type === componentData!.type,
+        (c) => c.name === componentData.name && c.type === componentData.type,
       );
       if (!alreadyExists) {
         components.push(componentData);
@@ -100,9 +73,7 @@ export function getReactComponentHierarchy(
   return components.length > 0 ? components : null;
 }
 
-export function formatReactComponentHierarchy(
-  hierarchy: ComponentInfo[] | null,
-): string {
+export function formatReactComponentHierarchy(hierarchy) {
   if (!hierarchy || hierarchy.length === 0) {
     return "No React components found for this element.";
   }
@@ -117,7 +88,7 @@ export function formatReactComponentHierarchy(
   return description;
 }
 
-export function getSelectedElementAnnotation(element: HTMLElement) {
+export function getSelectedElementAnnotation(element) {
   const hierarchy = getReactComponentHierarchy(element);
   if (hierarchy?.[0]) {
     return {
@@ -127,7 +98,7 @@ export function getSelectedElementAnnotation(element: HTMLElement) {
   return { annotation: null };
 }
 
-export function getSelectedElementsPrompt(elements: HTMLElement[]) {
+export function getSelectedElementsPrompt(elements) {
   const selectedComponentHierarchies = elements.map((e) =>
     getReactComponentHierarchy(e),
   );
@@ -167,7 +138,7 @@ const injectHighlightStyle = () => {
   document.head.appendChild(style);
 };
 
-function getDomSelector(el: HTMLElement): string {
+function getDomSelector(el) {
   if (el.id) return `#${el.id}`;
   if (el.className && typeof el.className === "string") {
     return (
@@ -177,24 +148,18 @@ function getDomSelector(el: HTMLElement): string {
   return el.tagName.toLowerCase();
 }
 
-const Overlay: React.FC<{
-  toolbarRef: React.RefObject<HTMLDivElement | null>;
-  onSelect: (el: HTMLElement) => void;
-  onHover: (el: HTMLElement) => void;
-  onUnhover: () => void;
-  selectMode: boolean;
-}> = ({ toolbarRef, onSelect, onHover, onUnhover, selectMode }) => {
-  const lastHovered = useRef<HTMLElement | null>(null);
+const Overlay = ({ toolbarRef, onSelect, onHover, onUnhover, selectMode }) => {
+  const lastHovered = useRef(null);
 
   const handleMouseMove = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e) => {
       if (!selectMode) return;
       const overlay = e.currentTarget;
       overlay.style.pointerEvents = "none";
       const el = document.elementFromPoint(
         e.clientX,
         e.clientY,
-      ) as HTMLElement | null;
+      );
       overlay.style.pointerEvents = "auto";
 
       // Build ignore list from toolbar ref
@@ -222,7 +187,7 @@ const Overlay: React.FC<{
   }, [onUnhover, selectMode]);
 
   const handleClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
+    (e) => {
       e.preventDefault();
       e.stopPropagation();
       const overlay = e.currentTarget;
@@ -230,7 +195,7 @@ const Overlay: React.FC<{
       const el = document.elementFromPoint(
         e.clientX,
         e.clientY,
-      ) as HTMLElement | null;
+      );
       overlay.style.pointerEvents = "auto";
 
       // Build ignore list from toolbar ref
@@ -262,9 +227,9 @@ const Overlay: React.FC<{
   );
 };
 
-export const VlyToolbar: React.FC = () => {
+export const VlyToolbar = () => {
   const [selectMode, setSelectMode] = useState(false);
-  const toolbarRef = useRef<HTMLDivElement | null>(null);
+  const toolbarRef = useRef(null);
   const [showDevOverlay, setShowDevOverlay] = React.useState(true);
 
   const isDevDeployment =
@@ -278,7 +243,7 @@ export const VlyToolbar: React.FC = () => {
 
   // Listen for postMessage from parent to enable/disable select mode
   React.useEffect(() => {
-    function handleMessage(event: MessageEvent) {
+    function handleMessage(event) {
       if (event.data && event.data.type === "vly-toolbar-enable-select") {
         setSelectMode(true);
       }
@@ -291,16 +256,14 @@ export const VlyToolbar: React.FC = () => {
   }, []);
 
   // Callbacks for overlay
-  const handleSelect = useCallback(async (el: HTMLElement) => {
+  const handleSelect = useCallback(async (el) => {
     setSelectMode(false);
     const selector = getDomSelector(el);
     const hierarchy = getReactComponentHierarchy(el);
     const formatted = formatReactComponentHierarchy(hierarchy);
 
-    let imageDataUrl: string | undefined = undefined;
+    let imageDataUrl = undefined;
     try {
-      // Optionally, preload resources for best results
-      // await preCache(el);
       const canvas = await snapdom.toCanvas(el, { fast: true });
       imageDataUrl = canvas.toDataURL("image/png");
     } catch (e) {
@@ -324,7 +287,7 @@ export const VlyToolbar: React.FC = () => {
   }, []);
 
   const handleUnhover = useCallback(() => {
-    // Optionally do something on unhover
+    // Optionally do something on hover
   }, []);
 
   // Get project name for redirect URL
@@ -340,7 +303,7 @@ export const VlyToolbar: React.FC = () => {
 
   // Handle escape key to close modal
   React.useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e) => {
       if (e.key === 'Escape' && showDevOverlay) {
         setShowDevOverlay(false);
       }
@@ -352,7 +315,7 @@ export const VlyToolbar: React.FC = () => {
     }
   }, [showDevOverlay]);
 
-  const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleOverlayClick = (e) => {
     // Only dismiss if clicking the overlay itself, not the modal content
     if (e.target === e.currentTarget) {
       setShowDevOverlay(false);
@@ -451,10 +414,6 @@ export const VlyToolbar: React.FC = () => {
           selectMode={selectMode}
         />
       )}
-      {/* Hide toolbar if there are no buttons or controls to show */}
-      {/* If toolbar has no children, render nothing */}
-      {/* <div ref={toolbarRef} ... /> is now hidden if empty */}
-      {/* If you add controls in the future, restore this div */}
     </>
   );
 };
